@@ -1,0 +1,2 @@
+/gpfs/csic_projects/tier3data/TreesPHYS14/PU20bx25//Tree_TTbar_Pythia_0.root
+/gpfs/csic_projects/tier3data/TreesPHYS14/PU20bx25//Tree_TTbar_Pythia_1.root
