@@ -1,0 +1,2 @@
+/gpfs/csic_projects/tier3data/TreesDR74X/50ns//Tree_TTJets_aMCatNLO_0.root
+/gpfs/csic_projects/tier3data/TreesDR74X/50ns//Tree_TTJets_aMCatNLO_1.root
