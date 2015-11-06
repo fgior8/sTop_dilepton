@@ -1,5 +1,57 @@
 #include "XSlist.h"
 
+float getXS_D(TString MCsample) {
+  float eventXS=-1.;
+  
+  if (MCsample.Contains("TTJets")) 
+    eventXS=831.8/89704515;
+  if (MCsample.Contains("TTLep_pow")) 
+    eventXS=87.3/4997000;
+  if (MCsample.Contains("TbarW")) 
+    eventXS=35.6/995600;
+  if (MCsample.Contains("TW")) 
+    eventXS=35.6/995600;
+  if (MCsample.Contains("DYJetsToLL_M10to50")) 
+    eventXS=22635.1/29678847;
+  if (MCsample.Contains("DYJetsToLL_M50")) 
+    eventXS=6025.2/28747969;
+  if (MCsample.Contains("WJetsToLNu")) 
+    eventXS=61526.7/22394671;
+  if (MCsample.Contains("TTWToLNu")) 
+    eventXS=0.204/252908;
+  if (MCsample.Contains("TTWToQQ")) 
+    eventXS=0.406/833964;
+  if (MCsample.Contains("TTZToLLNuNu")) //to be checked
+    eventXS=0.204/252908.;
+  if (MCsample.Contains("TTZToQQ")) 
+    eventXS=0.5297/749800;
+  if (MCsample.Contains("WW")) 
+    eventXS=115.0/993640; 
+  if (MCsample.Contains("WZ")) 
+    eventXS=47.1/978512;
+  if (MCsample.Contains("ZZ")) 
+    eventXS=16.5/996944;
+  if (MCsample.Contains("T2tt_850_100")) 
+    eventXS=0.019/240685.;
+  if (MCsample.Contains("T2tt_650LSP325")) 
+    eventXS=0.107*1000./105672.;
+  if (MCsample.Contains("T2tt_500_325")) 
+    eventXS=0.518/388207.;
+  if (MCsample.Contains("T2tt_425LSP325")) 
+    eventXS=1.312*1000./1039030.;
+
+  
+
+  if (eventXS == -1.) {
+    cout<<endl<<"NO CROSS-SECTION FOUND, PLEASE CHECK YOUR FILENAME OR LOOK INTO XSlis.cc"<<endl<<endl;
+    return 0;
+  }
+  else
+    return eventXS;
+}
+
+
+
 float getXS(TString MCsample) {
   float eventXS=-1.;
   
@@ -19,12 +71,65 @@ float getXS(TString MCsample) {
     eventXS=0.70*1000./249275.;
   if (MCsample == "WZTo3LNu") 
     eventXS=2.2*1000./237484.;
+  if (MCsample == "T2tt_850LSP100") 
+    eventXS=0.019*1000./102839.;
+  if (MCsample == "T2tt_650LSP325") 
+    eventXS=0.107*1000./105672.;
+  if (MCsample == "T2tt_500LSP325") 
+    eventXS=0.518*1000./109591.;
+  if (MCsample == "T2tt_425LSP325") 
+    eventXS=1.312*1000./1039030.;
+  if (MCsample == "ZZ4L")
+    eventXS=1.7*1000./1958600.;
+
   
-  if (MCsample == "WZTo3LNu") 
-    eventXS=2.2*1000./237484.;
-      
-  if (MCsample == "WZTo3LNu") 
-    eventXS=2.2*1000./237484.;
+
+  if (eventXS == -1.) {
+    cout<<endl<<"NO CROSS-SECTION FOUND, PLEASE CHECK YOUR FILENAME OR LOOK INTO XSlis.cc"<<endl<<endl;
+    return 0;
+  }
+  else
+    return eventXS;
+}
+
+
+float getXSFIVE(TString MCsample) {
+  float eventXS=-1.;
+
+  if(MCsample.Contains("40"))
+    eventXS=1.;
+  
+  if (MCsample == "TTbar_Powheg") 
+    eventXS=0.04229604854;
+  if (MCsample == "TTJets_aMCatNLO") 
+    //eventXS=0.1665435251;
+    eventXS=1000.*831.8/1.060e+10;
+  if (MCsample == "TbarW") 
+    eventXS=0.0356;
+  if (MCsample == "TW") 
+    eventXS=0.03565705128;
+
+  if (MCsample == "DYJets_aMCatNLO")
+    // eventXS=1.532400442;
+    eventXS=1000.*22635.1/393416887212.;
+  if (MCsample == "ZJets_aMCatNLO") 
+    //eventXS=0.3031459467;
+    eventXS=1000.*6025.2/312209331012.;
+  if (MCsample == "WJets_aMCatNLO") 
+    //eventXS=2.554035823;
+    eventXS=1000.*61526.7/3.720e+12;
+  
+  if (MCsample == "TTWJets") 
+    eventXS=0.72*1000./246521.;
+  if (MCsample == "TTZJets") 
+    eventXS=0.70*1000./249275.;
+  
+  if (MCsample == "WW") 
+    eventXS=118.7*1000./989608.; 
+  if (MCsample == "WZ") 
+    eventXS=65.9*1000./996920.;
+  if (MCsample == "ZZ") 
+    eventXS=31.8*1000./998848.;
   
   if (MCsample == "T2tt_850LSP100") 
     eventXS=0.019*1000./102839.;

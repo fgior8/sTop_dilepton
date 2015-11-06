@@ -3,7 +3,7 @@
 
 #include <set>
 #include "TTree.h"
-#include "Prova.h"
+#include "Data.h"
 #include "TH2F.h"
 #include "Reweight.h"
 #include "BTagSFUtil.h"
@@ -11,6 +11,7 @@
 #include "MuonPlots.h"
 #include "ElectronPlots.h"
 #include "JetPlots.h"
+#include "ZDYPlots.h"
 #include "XSlist.h"
 
 #include "Lepton.h"
@@ -25,15 +26,28 @@
 
 using namespace std;
 
-class Analyzer : public Prova {
+class Analyzer : public Data {
 
 
-  static const Bool_t debug = false; 
-  static const Double_t integratedlumi = 19762.501;
+  static const Bool_t debug = false;
+  static const Bool_t SaveTree = false;
+  static const Bool_t Blind = true;
+  static const Double_t integratedlumi = 1260.;
 //  static const Double_t integratedlumi = 1.0; //for Fakes
   static const Double_t Mass_Z = 91.1876;
   static const Double_t Mass_W = 80.398;
+  enum Variation {CentralValue, JetEnUp, JetEnDown, JetResUp, JetResDown, MuonEnUp, MuonEnDow, ElectronEnUp, ElectronEnDown, TauEnUp, TauEnDown, UnclusteredEnUp, UnclusteredEnDown};
 
+  //SF parametrization
+  TFile *MuSF_trig, *ElSF_trig, *MuElSF_trig;
+  TFile *MuSF_IDISO, *ElSF_IDISO;
+  TH2F *hmuIDSF, *hmumuTriggerSF;
+  TH2F *heIDSF, *heeTriggerSF;
+  TH2F *hmueTriggerSF;
+  //SF
+
+  Bool_t isData, MCatNLO;
+  Bool_t isDoubleEl, isMuEG, isDoubleMu;
   TString completename, treename;
   TFile *outfile;
   Long64_t entrieslimit;
@@ -42,8 +56,8 @@ class Analyzer : public Prova {
   
   TDirectory *Dir;
   Int_t index;
+  UInt_t channel, cut, cutZDY;
   Bool_t *goodVerticies;
-  Float_t HT;
   UInt_t numberVertices, VertexN;
   MuonSel Muon;
   ElectronSel Electron;
@@ -51,15 +65,21 @@ class Analyzer : public Prova {
 
   MuonPlots ***h_muons;
   ElectronPlots ***h_electrons;
-  JetPlots ***h_jets, ***h_bjets;
+  JetPlots ***h_jets, ***h_bjets, ***h_HTjets;
   SignalPlots ***h_signal;
+  SignalPlots ****h_systematics;
+  ZDYPlots ***h_ZDYplots;
   
-  UInt_t ncuts, nchannels;
-  vector<Int_t> selectionStep;
-  vector<Int_t> selectChannel;
-  Bool_t Zveto;
-  Float_t MCweight, weight;
+  UInt_t ncuts, nchannels, nsystematics;
+  vector<Int_t> selectionStep; vector<Int_t> selectChannel; vector<Int_t> selectionStepZDY;
+  vector<Lepton> muonColl; vector<Lepton> electronColl;
+  vector<Jet> jetColl[14]; vector<Jet> bjetColl[14]; vector<Jet> jetHTColl[14];
+  vector<Jet> jetSelect; vector<Lepton> leptonSelect;
 
+  Float_t HT, met_cut;
+  Bool_t Zveto;
+  Float_t invMtemp;
+  Float_t MCweight, weight;
  
   
   TH1F *h_prova;
@@ -82,11 +102,23 @@ class Analyzer : public Prova {
   float TMT2ll;
   float TMT2bb;
   float TMT2lblb;
-  TLorentzVector TMuon_Lorentz[20];
-  TLorentzVector TElec_Lorentz[20];
-  TLorentzVector TJet_Lorentz[50];
+  Float_t TMuon_Px[20];
+  Float_t TMuon_Py[20];
+  Float_t TMuon_Pz[20];
+  Float_t TMuon_E[20];
+  Float_t TElec_Px[20];
+  Float_t TElec_Py[20];
+  Float_t TElec_Pz[20];
+  Float_t TElec_E[20];
+  Float_t TJet_Px[50];
+  Float_t TJet_Py[50];
+  Float_t TJet_Pz[50];
+  Float_t TJet_E[50];
   Float_t TJet_discriminant[50];
-  TLorentzVector TBJet_Lorentz[30];
+  Float_t TBJet_Px[30];
+  Float_t TBJet_Py[30];
+  Float_t TBJet_Pz[30];
+  Float_t TBJet_E[30];
   Float_t TMuon_Charge[20];
   Float_t TElec_Charge[20];
 

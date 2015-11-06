@@ -13,6 +13,7 @@ using namespace std;
 class JJ {
 
   TLorentzVector vJet;
+  vector<Jet> pre_jetColl[3];
   Bool_t jetIsOK;
   Float_t pt_cut_min, pt_cut_max, eta_cut, bdisc_cut;
   
@@ -20,17 +21,22 @@ class JJ {
   JJ();
   ~JJ();
  
-  void JetSelection(std::vector<Bool_t> Jet_Id_loose, std::vector<Float_t> Jet_Eta, std::vector<Float_t> Jet_Px, std::vector<Float_t> Jet_Py, std::vector<Float_t> Jet_Pz, std::vector<Float_t> Jet_Pt, std::vector<Float_t> Jet_E, std::vector<Float_t> Jet_neutralEmEnergyFraction, std::vector<Float_t> Jet_neutralHadronEnergyFraction, std::vector<Float_t> Jet_chargedEmEnergyFraction, std::vector<Float_t> Jet_chargedHadronEnergyFraction, std::vector<Int_t> Jet_chargedMultiplicity, std::vector<Int_t> Jet_NConstituents, std::vector<Float_t> Jet_BTag, std::vector<Jet>& jetColl);
+  void JetSelection(Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Jet>& jetColl);
   
-  void JetSelectionLeptonVeto(std::vector<Bool_t> Jet_Id_loose, std::vector<Float_t> Jet_Eta, std::vector<Float_t> Jet_Px, std::vector<Float_t> Jet_Py, std::vector<Float_t> Jet_Pz, std::vector<Float_t> Jet_Pt, std::vector<Float_t> Jet_E, std::vector<Float_t> Jet_neutralEmEnergyFraction, std::vector<Float_t> Jet_neutralHadronEnergyFraction, std::vector<Float_t> Jet_chargedEmEnergyFraction, std::vector<Float_t> Jet_chargedHadronEnergyFraction, std::vector<Int_t> Jet_chargedMultiplicity, std::vector<Int_t> Jet_NConstituents, std::vector<Float_t> Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet>& jetColl);
+  void JetSelectionLeptonVeto(Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet>& jetColl);
 
-  void BJetSelectionLeptonVeto(std::vector<Bool_t> Jet_Id_loose, std::vector<Float_t> Jet_Eta, std::vector<Float_t> Jet_Px, std::vector<Float_t> Jet_Py, std::vector<Float_t> Jet_Pz, std::vector<Float_t> Jet_Pt, std::vector<Float_t> Jet_E, std::vector<Float_t> Jet_neutralEmEnergyFraction, std::vector<Float_t> Jet_neutralHadronEnergyFraction, std::vector<Float_t> Jet_chargedEmEnergyFraction, std::vector<Float_t> Jet_chargedHadronEnergyFraction, std::vector<Int_t> Jet_chargedMultiplicity, std::vector<Int_t> Jet_NConstituents, std::vector<Float_t> Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet>& jetColl);
+  void JetSelectionLeptonVeto_andB(Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet>& jetColl, std::vector<Jet>& jetBColl);
 
   void SetPt(Float_t minPt, Float_t maxPt);
   void SetPt(Float_t minPt);
   void SetEta(Float_t Eta);
   void SetBdisc(Float_t Bdisc);
- 
+
+  //// SYSTEMATICS /////
+  void JetSelectionLeptonVeto_JU(Float_t *Jet_JES, Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet> *jetColl);
+
+  void JetSelectionLeptonVeto_andB_JU(Float_t *Jet_JES, Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet> *jetColl, std::vector<Jet> *jetBColl);
+  
 };
 
 #endif

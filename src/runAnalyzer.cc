@@ -14,7 +14,7 @@ int main (int argc, const char* argv[]) {
 
   const char * _output   = 0;
   const char * _input    = 0;
-  const char * _dir      = "./DataSetList/";
+  const char * _dir      = "./DataSetList/25ns/";
   const char * _version  = 0;
   const char * _nevents  = 0;
   

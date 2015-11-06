@@ -5,25 +5,23 @@ MuonSel::MuonSel() {};
 
 MuonSel::~MuonSel() {};
 
-void MuonSel::MuonSelection(std::vector<Bool_t> IsPF, std::vector<Bool_t> IsGlobal, std::vector<Float_t> Eta, std::vector<Float_t> Pt, std::vector<Float_t> PtErr, std::vector<Float_t> Px, std::vector<Float_t> Py, std::vector<Float_t> Pz, std::vector<Float_t> E, std::vector<Float_t> ChargedIso, std::vector<Float_t> NeutralIso, std::vector<Float_t> PhotonIso, std::vector<Int_t> Charge, std::vector<Int_t> ValidHits, std::vector<Int_t> PixelValidHits, std::vector<Int_t> ValidStations, std::vector<Int_t> LayersWithMeasurement, std::vector<Float_t> GlobalChi2, std::vector<Float_t> TrkIPToolsIP, std::vector<Float_t> TrkIPToolsZ, std::vector<Float_t> PUpt, std::vector<Lepton>& leptonColl) {
+void MuonSel::MuonSelection(Int_t *pdgId, Int_t *IsPF, Float_t *Eta, Float_t *Pt, Float_t *Px, Float_t *Py, Float_t *Pz, Float_t *E, Float_t *relIso, Int_t *Charge, Int_t *ValidHits, Int_t *PixelValidHits, Float_t *ValidStations, Int_t *LayersWithMeasurement, Float_t *GlobalChi2, Float_t *dxy_ver, Float_t *dz_ver, std::vector<Lepton>& leptonColl) {
 
-  for (UInt_t ilep=0; ilep<Pt.size(); ilep++) {
+  for (UInt_t ilep=0; ilep<sizeof(Pt); ilep++) {
+    if (fabs(pdgId[ilep])!=13) continue;
     LeptonchiNdof = GlobalChi2[ilep]; 
 
-    dz = fabs(TrkIPToolsZ[ilep]);
-    dxy = fabs(TrkIPToolsIP[ilep]);   
+    dz = dz_ver[ilep];
+    dxy = dxy_ver[ilep];   
     vLepton.SetPxPyPzE(Px[ilep], Py[ilep], Pz[ilep], E[ilep]);
 
     fakeType = Lepton::unknown;
     looseTight = Lepton::Other;
     leptonType = Lepton::Muon;
  
-    if (Pt[ilep] > 0.01)
-      LeptonRelIso = (ChargedIso[ilep] + std::max(0.0, NeutralIso[ilep] + PhotonIso[ilep] - 0.5*PUpt[ilep]))/Pt[ilep];
-    else LeptonRelIso = 9999.;
-    if (LeptonRelIso<0) LeptonRelIso=0.0001;
+    LeptonRelIso = relIso[ilep];
     
-    (IsPF[ilep] && IsGlobal[ilep] && ValidHits[ilep]>0 && PixelValidHits[ilep]>0 && ValidStations[ilep]>1 && LayersWithMeasurement[ilep]>5) ? individual = true :individual = false;
+    (IsPF[ilep]>0 && ValidHits[ilep]>0 && PixelValidHits[ilep]>0 && ValidStations[ilep]>1 && LayersWithMeasurement[ilep]>5) ? individual = true :individual = false;
 
     (fabs(Eta[ilep]) < eta_cut && Pt[ilep] >= pt_cut_min && Pt[ilep] < pt_cut_max) ? etaPt=true : etaPt =false;
 

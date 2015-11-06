@@ -77,16 +77,80 @@ ReweightPU::ReweightPU(TString filenameData) {
     1.570E-05,
     5.005E-06};
 
+  Double_t Spring2015_50ns[53] = {
+    4.71E-09,
+    2.86E-06,
+    4.85E-06,
+    1.53E-05,
+    3.14E-05,
+    6.28E-05,
+    1.26E-04,
+    3.93E-04,
+    1.42E-03,
+    6.13E-03,
+    1.40E-02,
+    2.18E-02,
+    2.94E-02,
+    4.00E-02,
+    5.31E-02,
+    6.53E-02,
+    7.64E-02,
+    8.42E-02,
+    8.43E-02,
+    7.68E-02,
+    6.64E-02,
+    5.69E-02,
+    4.94E-02,
+    4.35E-02,
+    3.84E-02,
+    3.37E-02,
+    2.92E-02,
+    2.49E-02,
+    2.10E-02,
+    1.74E-02,
+    1.43E-02,
+    1.16E-02,
+    9.33E-03,
+    7.41E-03,
+    5.81E-03,
+    4.49E-03,
+    3.43E-03,
+    2.58E-03,
+    1.91E-03,
+    1.39E-03,
+    1.00E-03,
+    7.09E-04,
+    4.93E-04,
+    3.38E-04,
+    2.28E-04,
+    1.51E-04,
+    9.83E-05,
+    6.29E-05,
+    3.96E-05,
+    2.45E-05,
+    1.49E-05,
+    4.71E-06,
+    2.36E-06};
+  
+
   h_MCmod_ = (TH1D*)h_Data_->Clone("h_MCmod_");
+  h_Datamod_ = (TH1D*)h_Data_->Clone("h_MCmod_");
   for (Int_t i = 1; i < 61; i++) {
-    h_MCmod_->SetBinContent(i, Summer2012_S10[i-1]);
+    if (i<53) {
+      h_MCmod_->SetBinContent(i, Spring2015_50ns[i-1]);
+      h_Datamod_->SetBinContent(i, h_Data_->GetBinContent(i));
+    }
+    else {
+      h_MCmod_->SetBinContent(i,0.);
+      h_Datamod_->SetBinContent(i,0.);   
+    }
   }
 
   double int_MC_ = h_MCmod_->Integral();
-  double int_Data_ = h_Data_->Integral();
+  double int_Data_ = h_Datamod_->Integral();
 
-  h_Data_->Divide(h_MCmod_);
-  h_Data_->Scale(int_MC_ / int_Data_);
+  h_Datamod_->Divide(h_MCmod_);
+  h_Datamod_->Scale(int_MC_ / int_Data_);
 
   /*
     cout << endl;
@@ -99,10 +163,11 @@ ReweightPU::~ReweightPU() {
   delete fileData_;
   delete h_MCmod_;
   delete h_Data_;
+  delete h_Datamod_;
 }
 
 double ReweightPU::GetWeight(double nvtx) {
       
-  return h_Data_->GetBinContent( h_Data_->FindBin(nvtx) );
+  return h_Datamod_->GetBinContent( h_Datamod_->FindBin(nvtx) );
   
 }

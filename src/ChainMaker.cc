@@ -12,7 +12,7 @@ TChain* ChainMaker(TString filelistT) {
 
   std::cout << "root file .txt list: input file stream bad? " << fin.bad()<<std::endl;
 
-  TChain* chain = new TChain("demo/Tree");
+  TChain* chain = new TChain("tree");
 
   if (!chain) std::cout << "\n\nTChain is null!\n\n";
 

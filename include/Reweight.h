@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <iostream>
 
+using namespace std;
+
 #include "TFile.h"
 #include "TH1D.h"
 #include "TH1F.h"
@@ -21,6 +23,7 @@ class ReweightPU {
   
   TH1D* h_MCmod_;
   TH1D* h_Data_;
+  TH1D* h_Datamod_;
       
 };
 
