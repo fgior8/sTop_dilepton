@@ -1,0 +1,7 @@
+/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_TTJets_4.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_TTJets_5.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_TTJets_3.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_TTJets_0.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_TTJets_2.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_TTJets_1.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_TTJets_6.root
