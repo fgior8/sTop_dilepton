@@ -4,13 +4,19 @@ Analyzer::Analyzer() {
 
   if (debug) cout<<"inizio"<<endl;
 
-  //  MuSF_trig   = TFile::Open("./ScaleFactors/triggerSummary_mumu_ttbar.root"); //only EMu for the moment //FIXME
-  //  ElSF_trig   = TFile::Open("./ScaleFactorsF/triggerSummary_ee_ttbar.root");
-  MuElSF_trig = TFile::Open("./ScaleFactors/triggerSummary_emu.root");
+  // PILEUP //
+  reweightPU = new ReweightPU("/gpfs/csic_projects/cms/fgior8/PileUpDistr/myhist.root");
+  if (debug) cout<< "PU histos loaded" <<endl;
+
+  // Scale Factors ///
+  
+  //  MuSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_mumu_ttbar.root"); //only EMu for the moment //FIXME
+  //  ElSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_ee_ttbar.root");
+  MuElSF_trig = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_emu.root");
   if(!MuElSF_trig)
     cout << "ERROR [MuonSF_trig]: Could not open file " << MuSF_trig << " or " << ElSF_trig << " or " << MuElSF_trig << "!"  << endl;
-  MuSF_IDISO   = TFile::Open("./ScaleFactors/muonGlobalSF_20150722.root");
-  ElSF_IDISO   = TFile::Open("./ScaleFactors/GlobalSF.root");
+  MuSF_IDISO   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/muonGlobalSF_20150722.root");
+  ElSF_IDISO   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/GlobalSF.root");
   if(!MuSF_IDISO || !ElSF_IDISO)
     cout << "ERROR [MuonSF_IDISO]: Could not open file " << MuSF_IDISO << " or " << ElSF_IDISO << "!"  << endl;
 
@@ -26,7 +32,6 @@ Analyzer::Analyzer() {
   hmueTriggerSF = (TH2F*) MuElSF_trig->Get("scalefactor_eta2d_with_syst")->Clone("mueTriggerSF");
   if(!hmueTriggerSF)
     cout << "ERROR [MuonElectronSF]: Could not find histogram for SF reweighting" << endl;
-  
   
   h_prova = new TH1F("h_prova","p_T",100,0,1000);
  
@@ -160,11 +165,6 @@ void Analyzer::Loop() {
 
   fBTagSF = new BTagSFUtil("CSVM");
 
-  // once we have data we must look a the pileup
-  reweightPU = new ReweightPU("./PileUpDistr/MyDataPileupHistogram_69400.root");
-
-  if (debug) cout<< "PU histos loaded" <<endl;
-
   if(!MCweight) MCweight=1;   
   weight=MCweight;
 
@@ -198,23 +198,13 @@ void Analyzer::Loop() {
 
     // Vertex Select
     numberVertices = nVert;
-    /*
-      goodVerticies = new Bool_t [numberVertices];
-      if ( !isGoodEvent(numberVertices, *T_Vertex_isFake, *T_Vertex_ndof, *T_Vertex_x, *T_Vertex_y, *T_Vertex_z, goodVerticies) ) continue;
-    
-      for(UInt_t vv=0; vv<T_Vertex_ndof->size(); vv++) {
-      if(goodVerticies[vv]) {
-      VertexN=vv;
-      break;
-      }
-      }
-    */
-    
+
     Float_t valueMET[] = {met_pt, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     Float_t valueMETPhi[] = {met_phi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     
 
-    if (!isData && false) {
+    if (!isData) {
+      //weight *= puWeight;
       /// ***PU reweghting*** ///
       //h_nvtx_norw->Fill(PileUpInteractionsTrue->at(0), MCweight);
       weight *= reweightPU->GetWeight(nTrueInt);
@@ -343,7 +333,7 @@ void Analyzer::Loop() {
 
 
       // applying scaling factor for ID and triggers (now that we have selected the event type)
-      if (!isData && sysvar==CentralValue && false) {
+      if (!isData && sysvar==CentralValue && true) {
 	//trigger SF only for emu but applied to both FIXME
 	weight *= hmueTriggerSF->GetBinContent( hmueTriggerSF->FindBin( fabs(leptonSelect[0].lorentzVec().Eta()),fabs(leptonSelect[1].lorentzVec().Eta()) ) );
       

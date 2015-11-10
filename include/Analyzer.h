@@ -30,7 +30,7 @@ class Analyzer : public Data {
 
 
   static const Bool_t debug = false;
-  static const Bool_t SaveTree = false;
+  static const Bool_t SaveTree = true;
   static const Bool_t Blind = true;
   static const Double_t integratedlumi = 1260.;
 //  static const Double_t integratedlumi = 1.0; //for Fakes
