@@ -242,7 +242,7 @@ void Analyzer::Loop() {
     Jets.SetPt(30);
     Jets.SetEta(2.4);
     Jets.SetBdisc(0.605);
-    Jets.JetSelectionLeptonVeto_andB_JU(tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCMVA, electronColl, muonColl, jetColl, bjetColl);
+    Jets.JetSelectionLeptonVeto_andB_JU(tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCSV, electronColl, muonColl, jetColl, bjetColl);
    
     if(debug) cout<< "DONE object selection" <<endl;
     for (Variation sysvar=(Analyzer::Variation)0;sysvar<nsystematics+1;sysvar=(Analyzer::Variation)(sysvar+1)) {
