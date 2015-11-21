@@ -132,6 +132,14 @@ void Analyzer::Loop() {
     AnalysisTree->Branch("TMT2bb",&TMT2bb,"TMT2bb/F");
     AnalysisTree->Branch("TMT2lblb",&TMT2lblb,"TMT2lblb/F");
     AnalysisTree->Branch("THT",&THT,"THT/F");
+    AnalysisTree->Branch("TMll",&TMll,"TMll/F");
+    AnalysisTree->Branch("TMeff",&TMeff,"TMeff/F");
+    AnalysisTree->Branch("TPtllb",&TPtllb,"TPtllb/F");
+    AnalysisTree->Branch("TdPhiPtllbMET",&TdPhiPtllbMET,"TdPhiPtllbMET/F");
+    AnalysisTree->Branch("TdPhiJetMet",&TdPhiJetMet,"TdPhiJetMet/F");
+    AnalysisTree->Branch("TdPhiLepMet",&TdPhiLepMet,"TdPhiLepMet/F");
+    AnalysisTree->Branch("TdPhiLepJet",&TdPhiLepJet,"TdPhiLepJet/F");
+    AnalysisTree->Branch("TdPhill",&TdPhill,"TdPhill/F");
     AnalysisTree->Branch("TNMuon",&TNMuon,"TNMuon/I");
     AnalysisTree->Branch("TNElec",&TNElec,"TNElec/I");
     AnalysisTree->Branch("TNJets",&TNJets,"TNJets/I");
@@ -392,7 +400,15 @@ void Analyzer::Loop() {
       TMT2ll = getMT2(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec(), valueMET[0], valueMETPhi[0]);
       TMT2bb = getMT2bb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
       TMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
-	  
+      TMll = getMll(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec());
+      TPtllb = getPtllb(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec(), valueMET[0], valueMETPhi[0]).Pt();
+      TMeff = getMeff(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
+      TdPhiPtllbMET = getdPhiPtllbMet(getPtllb(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec(), valueMET[0], valueMETPhi[0]), valueMET[0], valueMETPhi[0]);
+      TdPhiJetMet = getdPhiJetMet(jetSelect, valueMET[0], valueMETPhi[0]); //Closest Jet
+      TdPhiLepMet = getdPhiLepMet(leptonSelect[0].lorentzVec(), valueMET[0], valueMETPhi[0]);
+      TdPhiLepJet = getdPhiLepJet(leptonSelect[0].lorentzVec(), jetSelect[0].lorentzVec());
+      TdPhill = getdPhill(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec());
+
       // filling all tree variables
       if (SaveTree && jetSelect.size()>1 && leptonSelect.size()>1) {
 	TWeight = weight;
