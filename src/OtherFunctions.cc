@@ -1,5 +1,44 @@
 #include "OtherFunctions.h"
 
+float getMll(TLorentzVector lept1, TLorentzVector lept2){
+  return (lept1+lept2).M();
+}
+TLorentzVector getPtllb(TLorentzVector lept1, TLorentzVector lept2, float MET, float MET_phi){
+  TLorentzVector pmet; pmet.SetPtEtaPhiM(MET, 0., MET_phi, 0.);
+  return (lept1+lept2+pmet);
+}
+float getMeff(std::vector<Jet>& jets, std::vector<Lepton>& leptons, float MET, float MET_phi){
+  TLorentzVector pmet; pmet.SetPtEtaPhiM(MET, 0., MET_phi, 0.);
+  TLorentzVector Lep0 = leptons[0].lorentzVec();
+  TLorentzVector Lep1 = leptons[1].lorentzVec();
+  TLorentzVector BtagJet0 = jets[0].lorentzVec();
+  TLorentzVector BtagJet1 = jets[1].lorentzVec();
+  return pmet.Pt()+Lep0.Pt()+Lep1.Pt()+BtagJet0.Pt()+BtagJet1.Pt();
+}
+float getdPhiPtllbMet(TLorentzVector Ptllb, float MET, float MET_phi){
+  TLorentzVector pmet; pmet.SetPtEtaPhiM(MET, 0., MET_phi, 0.);
+  return pmet.DeltaPhi(Ptllb);
+}
+float getdPhiJetMet(std::vector<Jet>& jets, float MET, float MET_phi){
+  TLorentzVector pmet; pmet.SetPtEtaPhiM(MET, 0., MET_phi, 0.);
+  float mindphi = 9999.; float dphi = 0;
+  for(int i = 0; i<jets.size(); i++){
+    dphi = pmet.DeltaPhi(jets[i].lorentzVec());
+    if(TMath::Abs(mindphi) > TMath::Abs(dphi)) mindphi = dphi;
+  }
+  return mindphi;
+}
+float getdPhiLepMet(TLorentzVector lep, float MET, float MET_phi){
+  TLorentzVector pmet; pmet.SetPtEtaPhiM(MET, 0., MET_phi, 0.);
+  return pmet.DeltaPhi(lep);
+}
+float getdPhiLepJet(TLorentzVector lep, TLorentzVector jet){
+  return lep.DeltaPhi(jet);
+}
+float getdPhill(TLorentzVector lep1, TLorentzVector lep2){
+  return lep1.DeltaPhi(lep2);
+}
+
 float getMT2bb(std::vector<Jet>& jets, std::vector<Lepton>& leptons, float MET, float MET_phi) {
   float METx = MET*TMath::Cos(MET_phi);
   float METy = MET*TMath::Sin(MET_phi);
