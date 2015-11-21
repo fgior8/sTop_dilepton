@@ -19,6 +19,8 @@ class SignalPlots {
   TVector3 dilep_beta;
  
  public:
+  TH1F *h_Ptllb, *h_Meff;
+  TH1F *h_dPhill, *h_dPhiLepJet, *h_dPhiLepMet, *h_dPhiJetMet, *h_dPhiPtllbMet;
   TH1F *h_jjmass, *h_llmass, *h_lljjmass, *h_MET, *h_MET_phi, *h_METexp;
   TH1F *h_dilepPt, *h_HT, *h_MET2HT;
   TH1F *h_cosTheta1, *h_cosTheta2;
