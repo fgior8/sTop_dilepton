@@ -11,6 +11,15 @@ using namespace std;
 #include "Jet.h"
 #include "mt2bisect.h"
 
+float getMll(TLorentzVector lept1, TLorentzVector lept2);
+TLorentzVector getPtllb(TLorentzVector lept1, TLorentzVector lept2, float MET, float MET_phi);
+float getMeff(std::vector<Jet>& jets, std::vector<Lepton>& leptons, float MET, float MET_phi);
+float getdPhiPtllbMet(TLorentzVector Ptllb, float MET, float MET_phi);
+float getdPhiJetMet(std::vector<Jet>& jets, float MET, float MET_phi);
+float getdPhiLepMet(TLorentzVector lep, float MET, float MET_phi);
+float getdPhiLepJet(TLorentzVector lep, TLorentzVector jet);
+float getdPhill(TLorentzVector lep1, TLorentzVector lep2);
+
 float getMT2(TLorentzVector lept1, TLorentzVector lept2, float theMET, float theMETphi);
 
 float getMT2_80(TLorentzVector lept1, TLorentzVector lept2, float theMET, float theMETphi);
