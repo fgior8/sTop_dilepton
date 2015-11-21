@@ -102,6 +102,14 @@ class Analyzer : public Data {
   float TMT2ll;
   float TMT2bb;
   float TMT2lblb;
+  float TMll;
+  float TPtllb;
+  float TMeff;
+  float TdPhiPtllbMET;
+  float TdPhiJetMet;
+  float TdPhiLepMet;
+  float TdPhiLepJet;
+  float TdPhill;
   Float_t TMuon_Px[20];
   Float_t TMuon_Py[20];
   Float_t TMuon_Pz[20];
