@@ -22,7 +22,7 @@ float getXS_D(TString MCsample) {
   if (MCsample.Contains("TTWToQQ")) 
     eventXS=0.406/833964;
   if (MCsample.Contains("TTZToLLNuNu")) //to be checked
-    eventXS=0.204/252908.;
+    eventXS=0.2529/398000.;
   if (MCsample.Contains("TTZToQQ")) 
     eventXS=0.5297/749800;
   if (MCsample.Contains("WW")) 

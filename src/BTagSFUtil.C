@@ -1,17 +1,60 @@
-#include "BTagSFUtil.h"
-//#include "BTagSFPayloadMoriond13.C"
-#include "BTagSFPayloadWinter13.C"
-//#include "BTagSFPayloadWinter13NoTTbar.C"
-#include "BTagEfficienciesTTbarSummer12.C"
-//#include "FastSimCorrectionFactors2011.C"
-#include "FastSimCorrectionFactorsSummer12.C"
 
-BTagSFUtil::BTagSFUtil(TString BTagAlgorithm, TString DataPeriod, TString FastSimDataset, int Seed) {
+// https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration
+#include "BTagSFUtil.h"
+#include "BTagCalibrationStandalone.cc"
+//#include "BTagEfficienciesTTbarSummer12.C" // Change this to your sample efficiency
+#include "BTagEfficienciesTTbarSummer15.C" // Change this to your sample efficiency
+#include "FastSimCorrectionFactorsSummer12.C" // Change this to your sample efficiency
+
+BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString OperatingPoint, int SystematicIndex, TString FastSimDataset, int Seed) {
 
   rand_ = new TRandom3(Seed);
 
-  GetBTagPayload(BTagAlgorithm, DataPeriod);
+  string CSVFileName = "/gpfs/csic_users/fgior8/sTop/Juan/sTop_dilepton/test/" + BTagAlgorithm + ".csv";
+  BTagCalibration calib(BTagAlgorithm, CSVFileName);
 
+  string SystematicFlagBC = "central";
+  string SystematicFlagL  = "central";
+  if (abs(SystematicIndex)<10) {
+    if (SystematicIndex==-1 || SystematicIndex==-2) SystematicFlagBC = "down";
+    if (SystematicIndex==+1 || SystematicIndex==+2) SystematicFlagBC = "up";
+    if (SystematicIndex==-3) SystematicFlagL = "down";
+    if (SystematicIndex==+3) SystematicFlagL = "up";
+  }
+
+  TaggerCut = -1;
+  TaggerName = BTagAlgorithm;
+  TaggerOP = BTagAlgorithm;
+
+  if (OperatingPoint=="Loose")  {
+    TaggerOP += "L";
+    if (TaggerName=="CSV") TaggerCut = 0.244;
+    if (TaggerName=="CSVv2") TaggerCut = 0.605;
+    reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, MeasurementType, SystematicFlagBC);
+    //reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, MeasurementType, SystematicFlagL);
+    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, "comb", SystematicFlagL);
+  } else if (OperatingPoint=="Medium")  {
+    TaggerOP += "M";
+    if (TaggerName=="CSV") TaggerCut = 0.679;
+    if (TaggerName=="CSVv2") TaggerCut = 0.890;
+    reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, MeasurementType, SystematicFlagBC);
+    //reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, MeasurementType, SystematicFlagL);
+    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM,  "comb", SystematicFlagL);
+  } else if (OperatingPoint=="Tight")  {
+    TaggerOP += "T";
+    if (TaggerName=="CSV") TaggerCut = 0.898;
+    if (TaggerName=="TCHP") TaggerCut = 3.41;
+    if (TaggerName=="CSVv2") TaggerCut = 0.970;
+    reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, MeasurementType, SystematicFlagBC);
+    //reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, MeasurementType, SystematicFlagL);
+    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, "comb", SystematicFlagL);
+  } 
+
+  if (TaggerCut<0) 
+    cout << " " << TaggerName << " not supported for " << OperatingPoint << " WP" << endl;
+
+  FastSimSystematic = 0;
+  if (abs(SystematicIndex)>10) FastSimSystematic = SystematicIndex%10;
   GetFastSimPayload(BTagAlgorithm, FastSimDataset);
 
   if (TaggerCut<0.) 
@@ -25,60 +68,7 @@ BTagSFUtil::~BTagSFUtil() {
 
 }
 
-float BTagSFUtil::ScaleFactorB(float JetPt, int SystematicFlag) {
-   
-  if (JetPt<BTagPtBinEdge[0]) { cout << "SFb is not available for jet pt<20 GeV" << endl; return -1.; }
-
-  float x = JetPt;
-  if (JetPt>BTagPtBinEdge[nBTagPtBins]) x = BTagPtBinEdge[nBTagPtBins];
- 
-  int JetPtBin = -1;
-  for (int ptbtagbin = 0; ptbtagbin<nBTagPtBins; ptbtagbin++) 
-    if (x>=BTagPtBinEdge[ptbtagbin]) JetPtBin++;
-  
-  if (JetPt>x) SystematicFlag *= 2;
-
-  float SFb = funSFb->Eval(x) + SystematicFlag*SFb_error[JetPtBin];
-
-  return SFb;
-
-}
-
-float BTagSFUtil::ScaleFactorLight(float JetPt, float JetEta, int SystematicFlag) {
- 
-  if (JetPt<BTagPtBinEdge[0]) { cout << "SFlight is not available for jet pt<20 GeV" << endl; return -1.; }
- 
-  int JetEtaBin = -1;
-  for (int etabtagbin = 0; etabtagbin<nBTagEtaBins; etabtagbin++) 
-    if (fabs(JetEta)>=BTagEtaBinEdge[etabtagbin]) JetEtaBin++;
-
-  float MaxJetPtLight = funSFlight[JetEtaBin][SystematicFlag+1]->GetMaximumX();
-
-  float x = JetPt;
-  if (JetPt>MaxJetPtLight) x = MaxJetPtLight;
-
-  return funSFlight[JetEtaBin][SystematicFlag+1]->Eval(x);
-
-}
-
-float BTagSFUtil::ScaleFactorJet(int JetFlavor, float JetPt, float JetEta, int SystematicFlag) {
-  
-  float SF = -1.;
- 
-  if (JetPt<BTagPtBinEdge[0]) { cout << "SF is not available for jet pt<20 GeV" << endl; return -1.; }
-  if (fabs(JetEta)>2.4) { cout << "SF is not available for jet |eta|>2.4" << endl; return -1.; }
-
-  if (abs(JetFlavor)==5) SF = ScaleFactorB(JetPt, SystematicFlag);
-  else if (abs(JetFlavor)==4) SF = ScaleFactorB(JetPt, 2*SystematicFlag);
-  else SF = ScaleFactorLight(JetPt, JetEta, SystematicFlag);
-
-  if (SF==-1.) cout << "Jet parameter out of BTV prescriptions" << endl;
-
-  return SF;
-
-}
-
-float BTagSFUtil::FastSimCorrectionFactor(int JetFlavor, float JetPt, float JetEta, int FastSimSystematic) {
+float BTagSFUtil::FastSimCorrectionFactor(int JetFlavor, float JetPt, float JetEta) {
 
   float CF = 1.;
  
@@ -88,18 +78,22 @@ float BTagSFUtil::FastSimCorrectionFactor(int JetFlavor, float JetPt, float JetE
   int JetFlavorFlag = 2;
   if (abs(JetFlavor)==4) JetFlavorFlag = 1;
   else if (abs(JetFlavor)==5) JetFlavorFlag = 0;
+
+  int ThisFastSimSystematic = 0;
+  if (abs(FastSimSystematic)==JetFlavorFlag+1) 
+    ThisFastSimSystematic = FastSimSystematic/abs(FastSimSystematic);
  
   int JetPtBin = -1;
   for (int ptbin = 0; ptbin<nFastSimPtBins; ptbin++) 
     if (JetPt>=FastSimPtBinEdge[ptbin]) JetPtBin++;
 
-  if (JetPt>=FastSimPtBinEdge[nFastSimPtBins]) FastSimSystematic *= 2;
+  if (JetPt>=FastSimPtBinEdge[nFastSimPtBins]) ThisFastSimSystematic *= 2;
 
   int JetEtaBin = -1;  
   for (int etabin = 0; etabin<nFastSimEtaBins[JetFlavorFlag]; etabin++) 
     if (fabs(JetEta)>=FastSimEtaBinEdge[etabin][JetFlavorFlag]) JetEtaBin++;
     
-  CF = FastSimCF[JetPtBin][JetEtaBin][JetFlavorFlag] + FastSimSystematic*FastSimCF_error[JetPtBin][JetEtaBin][JetFlavorFlag];
+  CF = FastSimCF[JetPtBin][JetEtaBin][JetFlavorFlag] + ThisFastSimSystematic*FastSimCF_error[JetPtBin][JetEtaBin][JetFlavorFlag];
 
   if (CF<0.) CF = 0.; // Effect of large uncertainties on light CFs!
 
@@ -115,18 +109,29 @@ float BTagSFUtil::JetTagEfficiency(int JetFlavor, float JetPt, float JetEta) {
 
 }
 
-float BTagSFUtil::GetJetSF(int JetFlavor, float JetPt, float JetEta, int SystematicFlag, int FastSimSystematic) {
+float BTagSFUtil::GetJetSF(int JetFlavor, float JetPt, float JetEta) {
 
-  float Btag_SF = ScaleFactorJet(JetFlavor, JetPt, JetEta, SystematicFlag);
+  float Btag_SF;
+
+  float ThisJetPt = JetPt;
+  if (abs(JetFlavor)==4 || abs(JetFlavor)==5) {
+    if (JetPt>669.99) ThisJetPt = 669.99;
+  } else if (JetPt>999.99) ThisJetPt = 999.99;
+
+  if (abs(JetFlavor)==5) 
+    Btag_SF = reader_bc->eval(BTagEntry::FLAV_B, JetEta, ThisJetPt);
+  else if (abs(JetFlavor)==4) 
+    Btag_SF = reader_bc->eval(BTagEntry::FLAV_C, JetEta, ThisJetPt);
+  else Btag_SF = reader_l->eval(BTagEntry::FLAV_UDSG, JetEta, ThisJetPt);
   
   if (IsFastSimDataset)
-    Btag_SF *= FastSimCorrectionFactor(JetFlavor, JetPt, JetEta, FastSimSystematic);
-
+    Btag_SF *= FastSimCorrectionFactor(JetFlavor, JetPt, JetEta);
+  
   return Btag_SF;
 
 }
 
-bool BTagSFUtil::IsTagged(float JetDiscriminant, int JetFlavor, float JetPt, float JetEta, int SystematicFlag, int FastSimSystematic) {
+bool BTagSFUtil::IsTagged(float JetDiscriminant, int JetFlavor, float JetPt, float JetEta) {
   
   bool isBTagged = JetDiscriminant>TaggerCut;
 
@@ -134,7 +139,7 @@ bool BTagSFUtil::IsTagged(float JetDiscriminant, int JetFlavor, float JetPt, flo
 
   bool newBTag = isBTagged;
 
-  float Btag_SF = GetJetSF(JetFlavor, JetPt, JetEta, SystematicFlag, FastSimSystematic);
+  float Btag_SF = GetJetSF(JetFlavor, JetPt, JetEta);
   
   if (Btag_SF == 1) return newBTag; //no correction needed 
 

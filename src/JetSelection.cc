@@ -3,9 +3,9 @@
 JJ::JJ() { }
 JJ::~JJ() { }
 
-void JJ::JetSelection(Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Jet>& jetColl) {
+void JJ::JetSelection(Int_t nJet, Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Jet>& jetColl) {
 
-  for (UInt_t ijet = 0; ijet < sizeof(Jet_Pt); ++ijet) {
+  for (UInt_t ijet = 0; ijet < nJet; ++ijet) {
 
     if (Jet_Pt[ijet] >= pt_cut_min && Jet_Pt[ijet] < pt_cut_max
 	&& fabs(Jet_Eta[ijet]) < eta_cut
@@ -22,10 +22,10 @@ void JJ::JetSelection(Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Fl
   std::sort( jetColl.begin(), jetColl.end(), JetPTSorter );
 }
 
-void JJ::JetSelectionLeptonVeto(Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet>& jetColl) {
+void JJ::JetSelectionLeptonVeto(Int_t nJet, Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet>& jetColl) {
   std::vector<Jet> pre_jetColl;
 
-  for (UInt_t ijet = 0; ijet < sizeof(Jet_Pt); ijet++) {
+  for (UInt_t ijet = 0; ijet < nJet; ijet++) {
 
     if (Jet_Pt[ijet] >= pt_cut_min && Jet_Pt[ijet] < pt_cut_max
 	&& fabs(Jet_Eta[ijet]) < eta_cut
@@ -60,10 +60,10 @@ void JJ::JetSelectionLeptonVeto(Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *J
   std::sort( jetColl.begin(), jetColl.end(), JetPTSorter );
 }
 
-void JJ::JetSelectionLeptonVeto_andB(Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet>& jetColl, std::vector<Jet>& jetBColl) {
+void JJ::JetSelectionLeptonVeto_andB(Int_t nJet, Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet>& jetColl, std::vector<Jet>& jetBColl) {
   std::vector<Jet> pre_jetColl;
 
-  for (UInt_t ijet = 0; ijet < sizeof(Jet_Pt); ijet++) {
+  for (UInt_t ijet = 0; ijet < nJet; ijet++) {
 
     if (Jet_Pt[ijet] >= pt_cut_min && Jet_Pt[ijet] < pt_cut_max
 	&& fabs(Jet_Eta[ijet]) < eta_cut
@@ -127,11 +127,11 @@ void JJ::SetBdisc(Float_t Bdisc) {
 
 /// SYSTEMATICS ////
 
-void JJ::JetSelectionLeptonVeto_JU(Float_t *Jet_JES, Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet> *jetColl) {
+void JJ::JetSelectionLeptonVeto_JU(Int_t nJet, Float_t *Jet_JES, Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet> *jetColl) {
 
   for (UInt_t sys=0; sys<3; sys++)
     pre_jetColl[sys].clear();
-  for (UInt_t ijet = 0; ijet < sizeof(Jet_Pt); ijet++) {
+  for (UInt_t ijet = 0; ijet < nJet; ijet++) {
     if ( !( Jet_Id_loose[ijet]
 	    && fabs(Jet_Eta[ijet]) < eta_cut
 	    && Jet_neutralHadronEnergyFraction[ijet] < 0.99
@@ -189,11 +189,11 @@ void JJ::JetSelectionLeptonVeto_JU(Float_t *Jet_JES, Int_t *Jet_Id_loose, Float_
 }
 
 
-void JJ::JetSelectionLeptonVeto_andB_JU(Float_t *Jet_JES, Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet> *jetColl, std::vector<Jet> *jetBColl) {
+void JJ::JetSelectionLeptonVeto_andB_JU(Int_t nJet, Float_t *Jet_JES, Int_t *Jet_Id_loose, Float_t *Jet_Pt, Float_t *Jet_Eta, Float_t *Jet_Px, Float_t *Jet_Py, Float_t *Jet_Pz, Float_t *Jet_E, Float_t *Jet_neutralEmEnergyFraction, Float_t *Jet_neutralHadronEnergyFraction, Float_t *Jet_chargedEmEnergyFraction, Float_t *Jet_chargedHadronEnergyFraction, Int_t *Jet_chargedMultiplicity, Int_t *Jet_NConstituents, Float_t* Jet_BTag, std::vector<Lepton>& leptonColl1, std::vector<Lepton>& leptonColl2, std::vector<Jet> *jetColl, std::vector<Jet> *jetBColl) {
 
   for (UInt_t sys=0; sys<3; sys++)
     pre_jetColl[sys].clear();
-  for (UInt_t ijet = 0; ijet < sizeof(Jet_Pt); ijet++) {
+  for (UInt_t ijet = 0; ijet < nJet; ijet++) {
     if ( !( Jet_Id_loose[ijet]
 	    && fabs(Jet_Eta[ijet]) < eta_cut
 	    && Jet_neutralHadronEnergyFraction[ijet] < 0.99

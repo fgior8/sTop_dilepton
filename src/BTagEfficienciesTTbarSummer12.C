@@ -3,8 +3,8 @@ be used only for the same MC samples or for events with similar topology */
 
 float BTagSFUtil::TagEfficiencyB(float JetPt, float JetEta) {
 
-  if (TaggerName=="CSVL") {
-    if (20<=JetPt && JetPt<50) {
+  if (TaggerOP=="CSVv2L") {
+    if (30<=JetPt && JetPt<50) {
       if (JetEta>=2.2) return 0.809008; // 3312.87 0.682939
       else if (JetEta>=2) return 0.852787; // 3060.58 0.64046
       else if (JetEta>=1.8) return 0.858175; // 3707.54 0.572956
@@ -62,8 +62,8 @@ float BTagSFUtil::TagEfficiencyB(float JetPt, float JetEta) {
     }
   }
 
-  if (TaggerName=="CSVM") {
-    if (20<=JetPt && JetPt<50) {
+  if (TaggerOP=="CSVv2M") {
+    if (30<=JetPt && JetPt<50) {
       if (JetEta>=2.2) return 0.457318; // 3312.87 0.865525
       else if (JetEta>=2) return 0.581291; // 3060.58 0.891767
       else if (JetEta>=1.8) return 0.621905; // 3707.54 0.796378
@@ -118,12 +118,43 @@ float BTagSFUtil::TagEfficiencyB(float JetPt, float JetEta) {
     }
   }
 
+  if (TaggerOP=="CSVv2T") {
+    if (30<=JetPt && JetPt<50) {
+      if (JetEta>=1.8) return 0.387812; // 10077.4 0.485376 0.490232
+      else if (JetEta>=1.4) return 0.45759; // 10326.1 0.490268 0.499275
+      else if (JetEta>=1) return 0.474506; // 13698.8 0.426642 0.433902
+      else if (JetEta>=0.6) return 0.534178; // 16772.7 0.385169 0.391619
+      else if (JetEta>=0.2) return 0.547121; // 18426.4 0.366701 0.373442
+      else if (JetEta>=-0.2) return 0.524589; // 9619.12 0.509186 0.514535
+    } else if (50<=JetPt && JetPt<80) {
+      if (JetEta>=1.6) return 0.4476; // 13425.6 0.429146 0.435385
+      else if (JetEta>=1.2) return 0.516362; // 13893.6 0.423965 0.429079
+      else if (JetEta>=0.8) return 0.556665; // 19488.3 0.355857 0.362944
+      else if (JetEta>=0.6) return 0.596254; // 11673.4 0.454121 0.466361
+      else if (JetEta>=0.4) return 0.601248; // 12383.7 0.440001 0.445847
+      else if (JetEta>=0.2) return 0.588598; // 13135.8 0.429353 0.434044
+      else if (JetEta>=0) return 0.577497; // 13479.1 0.425461 0.434786
+    } else if (80<=JetPt && JetPt<120) {
+      if (JetEta>=1.2) return 0.477814; // 14438.7 0.415698 0.422847
+      else if (JetEta>=0.8) return 0.555712; // 12966.6 0.436359 0.443159
+      else if (JetEta>=0.4) return 0.603197; // 16832.3 0.37709 0.384097
+      else if (JetEta>=0) return 0.583599; // 19057.6 0.357092 0.362001
+    } else if (120<=JetPt && JetPt<160) {
+      if (JetEta>=0.6) return 0.51441; // 11410.5 0.467882 0.474973
+      else if (JetEta>=0) return 0.56342; // 10092 0.493696 0.504266
+    } else if (160<=JetPt && JetPt<210) {
+      if (JetEta>=-0.2) return 0.438987; // 7346.99 0.578972 0.589266
+    } else if (210<=JetPt && JetPt<100000) {
+      if (JetEta>=-0.2) return 0.371781; // 2881.77 0.900264 0.921969
+    }
+  }
+
   cout << "BTagSFUtil: Jet pt (" << JetPt << ") or jet eta (" << JetEta << ") out of range!" << endl;
 
-  if (TaggerName=="CSVL") return 0.80;
-  if (TaggerName=="CSVM") return 0.65;
+  if (TaggerOP=="CSVv2L") return 0.80;
+  if (TaggerOP=="CSVv2M") return 0.65;
 
-  cout << "BTagSFUtil: Tagger (" << TaggerName << ") not valid!" << endl;
+  cout << "BTagSFUtil: Tagger (" << TaggerOP << ") not valid!" << endl;
 
   return 0.0;
 
@@ -131,8 +162,8 @@ float BTagSFUtil::TagEfficiencyB(float JetPt, float JetEta) {
 
 float BTagSFUtil::TagEfficiencyC(float JetPt, float JetEta) {
 
-  if (TaggerName=="CSVL") {
-    if (20<=JetPt && JetPt<50) {
+  if (TaggerOP=="CSVv2L") {
+    if (30<=JetPt && JetPt<50) {
       if (JetEta>=0) return 0.473677; // 2671.38 0.966049
     } else if (50<=JetPt && JetPt<80) {
       if (JetEta>=-0.2) return 0.392501; // 1795.58 1.15237
@@ -147,8 +178,8 @@ float BTagSFUtil::TagEfficiencyC(float JetPt, float JetEta) {
     }
   }
 
-  if (TaggerName=="CSVM") {
-    if (20<=JetPt && JetPt<50) {
+  if (TaggerOP=="CSVv2M") {
+    if (30<=JetPt && JetPt<50) {
       if (JetEta>=1) return 0.137101; // 1367.57 0.93009
       else if (JetEta>=-0.2) return 0.172955; // 1302.01 1.04815
     } else if (50<=JetPt && JetPt<80) {
@@ -164,13 +195,30 @@ float BTagSFUtil::TagEfficiencyC(float JetPt, float JetEta) {
       if (JetEta>=-0.2) return 0.204649; // 276.093 2.42804
     }
   }
+
+  if (TaggerOP=="CSVv2T") {
+    if (30<=JetPt && JetPt<50) {
+      if (JetEta>=1.2) return 0.038948; // 1103.6 0.582384 0.649
+      else if (JetEta>=0) return 0.0730094; // 1565.53 0.657502 0.677727
+    } else if (50<=JetPt && JetPt<80) {
+      if (JetEta>=-0.2) return 0.0594221; // 1795.58 0.557916 0.604515
+    } else if (80<=JetPt && JetPt<120) {
+      if (JetEta>=-0.2) return 0.0597343; // 1061.43 0.727429 0.768528
+    } else if (120<=JetPt && JetPt<160) {
+      if (JetEta>=-0.2) return 0.0298142; // 484.451 0.772706 0.912494
+    } else if (160<=JetPt && JetPt<210) {
+      if (JetEta>=-0.2) return 0.0225716; // 302.053 0.854637 1.02596
+    } else if (210<=JetPt && JetPt<100000) {
+      if (JetEta>=-0.2) return 0.0136672; // 276.093 0.698752 0.945059
+    }
+  }
   
   cout << "BTagSFUtil: Jet pt (" << JetPt << ") or jet eta (" << JetEta << ") out of range!" << endl;
 
-  if (TaggerName=="CSVL") return 0.35;
-  if (TaggerName=="CSVM") return 0.16;
+  if (TaggerOP=="CSVv2L") return 0.35;
+  if (TaggerOP=="CSVv2M") return 0.16;
 
-  cout << "BTagSFUtil: Tagger (" << TaggerName << ") not valid!" << endl;
+  cout << "BTagSFUtil: Tagger (" << TaggerOP << ") not valid!" << endl;
 
   return 0.0;
 
@@ -178,35 +226,35 @@ float BTagSFUtil::TagEfficiencyC(float JetPt, float JetEta) {
 
 float BTagSFUtil::TagEfficiencyLight(float JetPt, float JetEta) {
 
-  if (TaggerName=="CSVL") {
-    if (20<=JetPt && JetPt<50) {
-      if (JetEta>=2.2) return 0.420442; // 3926.52 0.787767
-      else if (JetEta>=2) return 0.338665; // 2983.58 0.866418
+  if (TaggerOP=="CSVv2L") {
+    if (30<=JetPt && JetPt<50) {
+      if (JetEta>=2.2)      return 0.420442; // 3926.52 0.787767
+      else if (JetEta>=2)   return 0.338665; // 2983.58 0.866418
       else if (JetEta>=1.8) return 0.247388; // 3171.73 0.766173
       else if (JetEta>=1.6) return 0.238397; // 3493.16 0.720951
       else if (JetEta>=1.4) return 0.238432; // 3989.68 0.674632
       else if (JetEta>=1.2) return 0.240449; // 4269.08 0.654067
-      else if (JetEta>=1) return 0.148722; // 4592.34 0.525057
+      else if (JetEta>=1)   return 0.148722; // 4592.34 0.525057
       else if (JetEta>=0.8) return 0.165212; // 4739.99 0.539412
       else if (JetEta>=0.6) return 0.144527; // 5046.85 0.494956
       else if (JetEta>=0.4) return 0.148472; // 5155.2 0.495221
       else if (JetEta>=0.2) return 0.127898; // 4976.4 0.473432
-      else if (JetEta>=0) return 0.127603; // 5197.03 0.462818
+      else if (JetEta>=0)   return 0.127603; // 5197.03 0.462818
     } else if (50<=JetPt && JetPt<80) {
-      if (JetEta>=2.2) return 0.321751; // 2480.17 0.938024
-      else if (JetEta>=2) return 0.238807; // 1867.7 0.986545
+      if (JetEta>=2.2)      return 0.321751; // 2480.17 0.938024
+      else if (JetEta>=2)   return 0.238807; // 1867.7 0.986545
       else if (JetEta>=1.8) return 0.137103; // 1896.63 0.78979
       else if (JetEta>=1.6) return 0.123762; // 2209.89 0.700518
       else if (JetEta>=1.4) return 0.14158; // 2504.66 0.696588
       else if (JetEta>=1.2) return 0.113777; // 2764.43 0.603942
-      else if (JetEta>=1) return 0.0912294; // 2834.32 0.540841
+      else if (JetEta>=1)   return 0.0912294; // 2834.32 0.540841
       else if (JetEta>=0.8) return 0.0903294; // 2960.95 0.526794
       else if (JetEta>=0.6) return 0.101207; // 2992.92 0.5513
       else if (JetEta>=0.4) return 0.0799342; // 3249.78 0.475717
       else if (JetEta>=0.2) return 0.0784796; // 3148.24 0.479288
-      else if (JetEta>=0) return 0.0772237; // 3205.01 0.471529
+      else if (JetEta>=0)   return 0.0772237; // 3205.01 0.471529
     } else if (80<=JetPt && JetPt<120) {
-      if (JetEta>=2) return 0.252252; // 2326.08 0.900497
+      if (JetEta>=2)        return 0.252252; // 2326.08 0.900497
       else if (JetEta>=1.6) return 0.114915; // 2269.35 0.669469
       else if (JetEta>=1.4) return 0.110387; // 1359.65 0.849856
       else if (JetEta>=1.2) return 0.0830715; // 1533.19 0.704848
@@ -239,8 +287,8 @@ float BTagSFUtil::TagEfficiencyLight(float JetPt, float JetEta) {
     }
   }
   
-  if (TaggerName=="CSVM") {
-    if (20<=JetPt && JetPt<50) {
+  if (TaggerOP=="CSVv2M") {
+    if (30<=JetPt && JetPt<50) {
       if (JetEta>=2.2) return 0.0218702; // 3926.52 0.233411
       else if (JetEta>=2) return 0.0252778; // 2983.58 0.28737
       else if (JetEta>=1.8) return 0.0187535; // 3171.73 0.24087
@@ -318,13 +366,32 @@ float BTagSFUtil::TagEfficiencyLight(float JetPt, float JetEta) {
       else if (JetEta>=0) return 0.0180327; // 515.528 0.586074
     }
   }
+
+  if (TaggerOP=="CSVv2T") {
+    if (30<=JetPt && JetPt<50) {
+      if (JetEta>=1) return 0.00326464; // 26428.4 0.0350891 0.037114
+      else if (JetEta>=0) return 0.00355733; // 25115.4 0.037568 0.0382523
+    } else if (50<=JetPt && JetPt<80) {
+      if (JetEta>=1) return 0.00169019; // 16558.8 0.0319217 0.0354968
+      else if (JetEta>=-0.2) return 0.00225288; // 15556.8 0.0380119 0.0425972
+    } else if (80<=JetPt && JetPt<120) {
+      if (JetEta>=1) return 0.000915307; // 9073.96 0.0317458 0.0398403
+      else if (JetEta>=-0.2) return 0.00101768; // 8535.11 0.0345128 0.041528
+    } else if (120<=JetPt && JetPt<160) {
+      if (JetEta>=-0.2) return 0.00131949; // 8031.1 0.0405068 0.0509324
+    } else if (160<=JetPt && JetPt<210) {
+      if (JetEta>=-0.2) return 0.00114043; // 4727.13 0.0490893 0.0713493
+    } else if (210<=JetPt && JetPt<100000) {
+      if (JetEta>=0) return 0.000390689; // 4602.99 0.029128 0.0364063
+    }
+  }
   
   cout << "BTagSFUtil: Jet pt (" << JetPt << ") or jet eta (" << JetEta << ") out of range!" << endl;
 
-  if (TaggerName=="CSVL") return 0.10;
-  if (TaggerName=="CSVM") return 0.02;
+  if (TaggerOP=="CSVv2L") return 0.10;
+  if (TaggerOP=="CSVv2M") return 0.02;
 
-  cout << "BTagSFUtil: Tagger (" << TaggerName << ") not valid!" << endl;
+  cout << "BTagSFUtil: Tagger (" << TaggerOP << ") not valid!" << endl;
 
   return 0.0;
 

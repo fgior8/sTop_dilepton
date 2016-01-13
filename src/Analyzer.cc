@@ -5,7 +5,7 @@ Analyzer::Analyzer() {
   if (debug) cout<<"inizio"<<endl;
 
   // PILEUP //
-  reweightPU = new ReweightPU("/gpfs/csic_projects/cms/fgior8/PileUpDistr/myhist.root");
+  reweightPU = new ReweightPU("/gpfs/csic_projects/cms/fgior8/PileUpDistr/MyDataPileupHistogram.root");
   if (debug) cout<< "PU histos loaded" <<endl;
 
   // Scale Factors ///
@@ -132,6 +132,14 @@ void Analyzer::Loop() {
     AnalysisTree->Branch("TMT2bb",&TMT2bb,"TMT2bb/F");
     AnalysisTree->Branch("TMT2lblb",&TMT2lblb,"TMT2lblb/F");
     AnalysisTree->Branch("THT",&THT,"THT/F");
+    AnalysisTree->Branch("TMll",&TMll,"TMll/F");
+    AnalysisTree->Branch("TMeff",&TMeff,"TMeff/F");
+    AnalysisTree->Branch("TPtllb",&TPtllb,"TPtllb/F");
+    AnalysisTree->Branch("TdPhiPtllbMET",&TdPhiPtllbMET,"TdPhiPtllbMET/F");
+    AnalysisTree->Branch("TdPhiJetMet",&TdPhiJetMet,"TdPhiJetMet/F");
+    AnalysisTree->Branch("TdPhiLepMet",&TdPhiLepMet,"TdPhiLepMet/F");
+    AnalysisTree->Branch("TdPhiLepJet",&TdPhiLepJet,"TdPhiLepJet/F");
+    AnalysisTree->Branch("TdPhill",&TdPhill,"TdPhill/F");
     AnalysisTree->Branch("TNMuon",&TNMuon,"TNMuon/I");
     AnalysisTree->Branch("TNElec",&TNElec,"TNElec/I");
     AnalysisTree->Branch("TNJets",&TNJets,"TNJets/I");
@@ -163,7 +171,7 @@ void Analyzer::Loop() {
 
   if (debug) cout<< "loop begins" <<endl;
 
-  fBTagSF = new BTagSFUtil("CSVM");
+  fBTagSF = new BTagSFUtil("comb", "CSVv2", "Medium", 0, "", 123);
 
   if(!MCweight) MCweight=1;   
   weight=MCweight;
@@ -220,14 +228,14 @@ void Analyzer::Loop() {
     Muon.SetChiNdof(10);
     Muon.SetBSdxy(0.20);
     Muon.SetBSdz(0.50);
-    Muon.MuonSelection(LepGood_pdgId, LepGood_pfMuonId, LepGood_eta, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_trackerHits, LepGood_pixelLayers, LepGood_nStations, LepGood_trackerLayers, LepGood_globalTrackChi2, LepGood_dxy, LepGood_dz, muonColl);
+    Muon.MuonSelection(nLepGood, LepGood_pdgId, LepGood_pfMuonId, LepGood_eta, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_trackerHits, LepGood_pixelLayers, LepGood_nStations, LepGood_trackerLayers, LepGood_globalTrackChi2, LepGood_dxy, LepGood_dz, muonColl);
     
     Electron.SetPt(15);
     Electron.SetEta(2.5);
     Electron.SetRelIso(0.15);
     Electron.SetBSdxy(0.02);
     Electron.SetBSdz(0.10);
-    Electron.ElectronSelection(LepGood_pdgId, LepGood_etaSc, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_convVeto, LepGood_lostHits, LepGood_dEtaScTrkIn, LepGood_dPhiScTrkIn, LepGood_sigmaIEtaIEta, LepGood_hadronicOverEm, LepGood_eInvMinusPInv, LepGood_dxy, LepGood_dz, electronColl);
+    Electron.ElectronSelection(nLepGood, LepGood_pdgId, LepGood_etaSc, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_convVeto, LepGood_lostHits, LepGood_dEtaScTrkIn, LepGood_dPhiScTrkIn, LepGood_sigmaIEtaIEta, LepGood_hadronicOverEm, LepGood_eInvMinusPInv, LepGood_dxy, LepGood_dz, electronColl);
     
     ///cleaning vectors//
     for (UInt_t kk=0;kk<nsystematics+1;kk++) {//nsystematics
@@ -237,12 +245,12 @@ void Analyzer::Loop() {
     Float_t tmp_sys[] = {0,0};
     Jets.SetPt(10);
     Jets.SetEta(5.0);
-    Jets.JetSelectionLeptonVeto_JU(tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCMVA, electronColl, muonColl, jetHTColl);
+    Jets.JetSelectionLeptonVeto_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCMVA, electronColl, muonColl, jetHTColl);
     
     Jets.SetPt(30);
     Jets.SetEta(2.4);
     Jets.SetBdisc(0.605);
-    Jets.JetSelectionLeptonVeto_andB_JU(tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCSV, electronColl, muonColl, jetColl, bjetColl);
+    Jets.JetSelectionLeptonVeto_andB_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCSV, electronColl, muonColl, jetColl, bjetColl);
    
     if(debug) cout<< "DONE object selection" <<endl;
     for (Variation sysvar=(Analyzer::Variation)0;sysvar<nsystematics+1;sysvar=(Analyzer::Variation)(sysvar+1)) {
@@ -287,6 +295,17 @@ void Analyzer::Loop() {
 
       ///Filling standard particle plots END
 
+      if (electronColl.size()<2 && muonColl.size()>=4 && bjetColl[0].size()>=2) {
+	if (fabs((muonColl[0].lorentzVec()+muonColl[1].lorentzVec()+muonColl[2].lorentzVec()+muonColl[3].lorentzVec()).M()-125)<25 && fabs((bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M()-125)<25)
+	  h_prova->Fill((muonColl[0].lorentzVec()+muonColl[1].lorentzVec()+muonColl[2].lorentzVec()+muonColl[3].lorentzVec()+bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M(),weight); }
+      else if (muonColl.size()<2 &&  electronColl.size()>=4 && bjetColl[0].size()>=2) {
+	if (fabs((electronColl[0].lorentzVec()+electronColl[1].lorentzVec()+electronColl[2].lorentzVec()+electronColl[3].lorentzVec()).M()-125)<25 && fabs((bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M()-125)<25)
+	  h_prova->Fill((electronColl[0].lorentzVec()+electronColl[1].lorentzVec()+electronColl[2].lorentzVec()+electronColl[3].lorentzVec()+bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M(),weight);
+      }
+      else if (electronColl.size()<4 && muonColl.size()<4 && muonColl.size()>=2 && electronColl.size()>=2 && bjetColl[0].size()>=2) {
+	if (fabs((muonColl[0].lorentzVec()+muonColl[1].lorentzVec()+electronColl[0].lorentzVec()+electronColl[1].lorentzVec()).M()-125)<25 && fabs((bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M()-125)<25)
+	  h_prova->Fill((muonColl[0].lorentzVec()+muonColl[1].lorentzVec()+electronColl[0].lorentzVec()+electronColl[1].lorentzVec()+bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M(),weight);
+      }
 
       //Making leptons and jets selected collections
       // it seems more convinent to take only two leptons, once the triggers are set we need to add the here FIXME 
@@ -392,7 +411,7 @@ void Analyzer::Loop() {
       TMT2ll = getMT2(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec(), valueMET[0], valueMETPhi[0]);
       TMT2bb = getMT2bb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
       TMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
-	  
+
       // filling all tree variables
       if (SaveTree && jetSelect.size()>1 && leptonSelect.size()>1) {
 	TWeight = weight;
@@ -403,7 +422,16 @@ void Analyzer::Loop() {
 	TNElec = electronColl.size();
 	TMET = valueMET[0];
 	TMET_Phi = valueMETPhi[0];
-	THT = HT;  
+	THT = HT;
+	
+	TMll = (leptonSelect[0].lorentzVec()+leptonSelect[1].lorentzVec()).M();
+	TPtllb = getllmetVector(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec(), valueMET[0], valueMETPhi[0]).Pt();
+	TMeff = getMeff(jetSelect, leptonSelect, valueMET[0]);
+	TdPhiPtllbMET = getdPhiPtllbMet(getllmetVector(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec(), valueMET[0], valueMETPhi[0]), valueMET[0], valueMETPhi[0]);
+	TdPhiJetMet = getdPhiJetMet(jetSelect, valueMET[0], valueMETPhi[0]); //Closest Jet
+	TdPhiLepMet = getdPhiLepMet(leptonSelect[0].lorentzVec(), valueMET[0], valueMETPhi[0]);
+	TdPhiLepJet = leptonSelect[0].lorentzVec().DeltaPhi(jetSelect[0].lorentzVec());
+	TdPhill = leptonSelect[0].lorentzVec().DeltaPhi(leptonSelect[1].lorentzVec());
 	for (Int_t i=0; i<muonColl.size(); i++) {
 	  TMuon_Charge[i] = muonColl[i].charge();
 	  TMuon_Px[i] = muonColl[i].lorentzVec().Px();

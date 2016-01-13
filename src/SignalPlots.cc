@@ -1,6 +1,14 @@
 #include "SignalPlots.h"
 
+const float pi = 3.14159265359;
 SignalPlots::SignalPlots(TString name) {
+  h_Ptllb =          new TH1F("h_Ptllb_"         + name,"P_{Tb}^{ll}", 70, 0, 700);
+  h_Meff =           new TH1F("h_Meff_"          + name,"M_{Eff}", 200, 0, 2000);
+  h_dPhill =         new TH1F("h_dPhill_"        + name,"|#Delta#Phi_{ll}| [rad / pi]", 50, 0, 1);
+  h_dPhiLepMet =     new TH1F("h_dPhiLepMet_"    + name,"|#Delta#Phi_{l,MET}| [rad / pi]", 50, 0, 1);
+  h_dPhiLepJet =     new TH1F("h_dPhiLepJet_"    + name,"|#Delta#Phi_{l,j}| [rad / pi]", 50, 0, 1);
+  h_dPhiJetMet =     new TH1F("h_dPhiJetMet_"    + name,"|#Delta#Phi_{closest-jet,MET}| [rad / pi]", 50, 0, 1);
+  h_dPhiPtllbMet =   new TH1F("h_dPhiPtllbMet_"  + name,"|#Delta#Phi_{P_{Tb}^{ll},MET}| [rad / pi]", 50, 0, 1);
   h_jjmass =         new TH1F("h_dijetsmass_"    + name,"Invariant mass of the two leading jets",100,0,1000);
   h_llmass =         new TH1F("h_llmass_"        + name,"Invariant mass of the two leading leptons",100,0,1000);
   h_lljjmass =       new TH1F("h_lljjmass_"      + name,"Invariant mass of the four particles",200,0,2000);
@@ -30,6 +38,13 @@ SignalPlots::SignalPlots(TString name) {
 }
 
 SignalPlots::~SignalPlots() {
+  delete h_Ptllb;
+  delete h_Meff;
+  delete h_dPhill;
+  delete h_dPhiLepMet;
+  delete h_dPhiLepJet;
+  delete h_dPhiJetMet;
+  delete h_dPhiPtllbMet;
   delete h_jjmass;
   delete h_llmass;
   delete h_lljjmass;
@@ -80,8 +95,15 @@ void SignalPlots::Fill(UInt_t numberVertices, Float_t MET, Float_t MET_phi, Floa
     h_MT2bb->Fill( getMT2bb(jets, leptons, MET, MET_phi), weight);
     h_MT2lblb->Fill( getMT2lblb(jets, leptons, MET, MET_phi), weight);  
     h3_MT2->Fill(getMT2(leptons[i].lorentzVec(), leptons[j].lorentzVec(), MET, MET_phi), getMT2lblb(jets, leptons, MET, MET_phi), getMT2bb(jets, leptons, MET, MET_phi), weight);
-    h_jjmass->Fill( (jets[m].lorentzVec()+jets[n].lorentzVec()).M(),weight);
-    h_lljjmass->Fill( (leptons[i].lorentzVec()+leptons[j].lorentzVec()+jets[m].lorentzVec()+jets[n].lorentzVec()).M(),weight);
+    h_jjmass->Fill( (jets[m].lorentzVec()+jets[n].lorentzVec()).M(), weight);
+    h_lljjmass->Fill( (leptons[i].lorentzVec()+leptons[j].lorentzVec()+jets[m].lorentzVec()+jets[n].lorentzVec()).M(), weight);
+    h_Ptllb->Fill(getllmetVector(leptons[0].lorentzVec(), leptons[1].lorentzVec(), MET, MET_phi).Pt(), weight);
+    h_Meff->Fill(getMeff(jets, leptons, MET), weight);
+    h_dPhill->Fill(fabs(leptons[0].lorentzVec().DeltaPhi(leptons[1].lorentzVec()))/pi, weight);
+    h_dPhiLepMet->Fill(fabs(getdPhiLepMet(leptons[0].lorentzVec(), MET, MET_phi))/pi, weight);
+    h_dPhiLepJet->Fill(fabs(leptons[0].lorentzVec().DeltaPhi(jets[0].lorentzVec()))/pi, weight);
+    h_dPhiJetMet->Fill(fabs(getdPhiJetMet(jets, MET, MET_phi))/pi, weight);
+    h_dPhiPtllbMet->Fill(fabs(getdPhiPtllbMet(getllmetVector(leptons[0].lorentzVec(), leptons[1].lorentzVec(), MET, MET_phi), MET, MET_phi))/pi, weight);
   }
   //TLorentzVector MET_tv;
   MET_tv.SetPtEtaPhiE(MET,0.,MET_phi,MET);
@@ -157,5 +179,12 @@ void SignalPlots::Write() {
   h_MT2ll_CosTheta->Write();
   h_PV->Write();
   h3_MT2->Write();
+  h_Ptllb->Write();
+  h_Meff->Write();
+  h_dPhill->Write();
+  h_dPhiLepMet->Write();
+  h_dPhiLepJet->Write();
+  h_dPhiJetMet->Write();
+  h_dPhiPtllbMet->Write();
 }
 
