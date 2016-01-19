@@ -20,7 +20,7 @@
 #include "MuonSelection.h"
 #include "ElectronSelection.h"
 #include "JetSelection.h"
-
+#include "GenParticleSelection.h"
 #include <iostream>
 #include <cmath>
 
@@ -62,6 +62,7 @@ class Analyzer : public Data {
   MuonSel Muon;
   ElectronSel Electron;
   JJ Jets;
+  GenSelection GenPart;
 
   MuonPlots ***h_muons;
   ElectronPlots ***h_electrons;
@@ -75,6 +76,7 @@ class Analyzer : public Data {
   vector<Lepton> muonColl; vector<Lepton> electronColl;
   vector<Jet> jetColl[14]; vector<Jet> bjetColl[14]; vector<Jet> jetHTColl[14];
   vector<Jet> jetSelect; vector<Lepton> leptonSelect;
+  vector<TLorentzVector> genElec, genMuon, genBquark, genLightquark;
 
   Float_t HT, met_cut;
   Bool_t Zveto;
@@ -102,6 +104,9 @@ class Analyzer : public Data {
   float TMT2ll;
   float TMT2bb;
   float TMT2lblb;
+  float GMT2ll;
+  float GMT2bb;
+  float GMT2lblb;
   float TMll;
   float TPtllb;
   float TMeff;

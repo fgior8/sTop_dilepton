@@ -9,18 +9,19 @@ Analyzer::Analyzer() {
   if (debug) cout<< "PU histos loaded" <<endl;
 
   // Scale Factors ///
-  
+  // --first for the trigger-- //
   //  MuSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_mumu_ttbar.root"); //only EMu for the moment //FIXME
   //  ElSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_ee_ttbar.root");
-  MuElSF_trig = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_emu.root");
+  MuElSF_trig = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_emu_13TeV_RunD.root");
   if(!MuElSF_trig)
     cout << "ERROR [MuonSF_trig]: Could not open file " << MuSF_trig << " or " << ElSF_trig << " or " << MuElSF_trig << "!"  << endl;
-  MuSF_IDISO   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/muonGlobalSF_20150722.root");
-  ElSF_IDISO   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/GlobalSF.root");
+  // --second for the ID and Isolation-- //
+  MuSF_IDISO   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/MuonSF_IDISO_Trigger_POG25ns.root");
+  ElSF_IDISO   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/elec_tight_sf2D_13TeV_RunD.root");
   if(!MuSF_IDISO || !ElSF_IDISO)
     cout << "ERROR [MuonSF_IDISO]: Could not open file " << MuSF_IDISO << " or " << ElSF_IDISO << "!"  << endl;
 
-  hmuIDSF        = (TH2F*) MuSF_IDISO->Get("SF_totErr")->Clone("muIDSF");
+  hmuIDSF        = (TH2F*) MuSF_IDISO->Get("GlobalSF")->Clone("muIDSF");
   //hmumuTriggerSF = (TH2F*) MuSF_trig ->Get("scalefactor_eta2d_with_syst")  ->Clone("mumuTriggerSF"); 
   if(!hmuIDSF)// || !hmumuTriggerSF)
     cout << "ERROR [MuonSF]: Could not find histogram for SF reweighting" << endl;
@@ -131,6 +132,9 @@ void Analyzer::Loop() {
     AnalysisTree->Branch("TMT2ll",&TMT2ll,"TMT2ll/F");
     AnalysisTree->Branch("TMT2bb",&TMT2bb,"TMT2bb/F");
     AnalysisTree->Branch("TMT2lblb",&TMT2lblb,"TMT2lblb/F");
+    AnalysisTree->Branch("GMT2ll",&GMT2ll,"GMT2ll/F");
+    AnalysisTree->Branch("GMT2bb",&GMT2bb,"GMT2bb/F");
+    AnalysisTree->Branch("GMT2lblb",&GMT2lblb,"GMT2lblb/F");
     AnalysisTree->Branch("THT",&THT,"THT/F");
     AnalysisTree->Branch("TMll",&TMll,"TMll/F");
     AnalysisTree->Branch("TMeff",&TMeff,"TMeff/F");
@@ -220,7 +224,8 @@ void Analyzer::Loop() {
     }
 
     if(debug) cout<< "object selection" <<endl;
-    muonColl.clear();    electronColl.clear();  
+    muonColl.clear();    electronColl.clear();
+    genElec.clear(); genMuon.clear(); genBquark.clear(); genLightquark.clear();
     
     Muon.SetPt(15);
     Muon.SetEta(2.4);
@@ -251,6 +256,8 @@ void Analyzer::Loop() {
     Jets.SetEta(2.4);
     Jets.SetBdisc(0.605);
     Jets.JetSelectionLeptonVeto_andB_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCSV, electronColl, muonColl, jetColl, bjetColl);
+
+    GenPart.GenPartSelection(nGenPart, GenPart_pdgId, GenPart_status, GenPart_motherId, GenPart_grandmotherId, GenPart_charge, GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, genElec, genMuon, genBquark, genLightquark);
    
     if(debug) cout<< "DONE object selection" <<endl;
     for (Variation sysvar=(Analyzer::Variation)0;sysvar<nsystematics+1;sysvar=(Analyzer::Variation)(sysvar+1)) {
@@ -294,18 +301,6 @@ void Analyzer::Loop() {
       if(debug) cout<< "generic plots FILLED" <<endl;
 
       ///Filling standard particle plots END
-
-      if (electronColl.size()<2 && muonColl.size()>=4 && bjetColl[0].size()>=2) {
-	if (fabs((muonColl[0].lorentzVec()+muonColl[1].lorentzVec()+muonColl[2].lorentzVec()+muonColl[3].lorentzVec()).M()-125)<25 && fabs((bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M()-125)<25)
-	  h_prova->Fill((muonColl[0].lorentzVec()+muonColl[1].lorentzVec()+muonColl[2].lorentzVec()+muonColl[3].lorentzVec()+bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M(),weight); }
-      else if (muonColl.size()<2 &&  electronColl.size()>=4 && bjetColl[0].size()>=2) {
-	if (fabs((electronColl[0].lorentzVec()+electronColl[1].lorentzVec()+electronColl[2].lorentzVec()+electronColl[3].lorentzVec()).M()-125)<25 && fabs((bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M()-125)<25)
-	  h_prova->Fill((electronColl[0].lorentzVec()+electronColl[1].lorentzVec()+electronColl[2].lorentzVec()+electronColl[3].lorentzVec()+bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M(),weight);
-      }
-      else if (electronColl.size()<4 && muonColl.size()<4 && muonColl.size()>=2 && electronColl.size()>=2 && bjetColl[0].size()>=2) {
-	if (fabs((muonColl[0].lorentzVec()+muonColl[1].lorentzVec()+electronColl[0].lorentzVec()+electronColl[1].lorentzVec()).M()-125)<25 && fabs((bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M()-125)<25)
-	  h_prova->Fill((muonColl[0].lorentzVec()+muonColl[1].lorentzVec()+electronColl[0].lorentzVec()+electronColl[1].lorentzVec()+bjetColl[0][0].lorentzVec()+bjetColl[0][1].lorentzVec()).M(),weight);
-      }
 
       //Making leptons and jets selected collections
       // it seems more convinent to take only two leptons, once the triggers are set we need to add the here FIXME 
@@ -359,9 +354,9 @@ void Analyzer::Loop() {
 	//ID SF applied per lepton
 	for (UInt_t i=0; i<leptonSelect.size(); i++) {
 	  if (leptonSelect[i].leptonType()=="Electron")
-	    weight *= heIDSF->GetBinContent( hmueTriggerSF->FindBin( fabs(leptonSelect[i].lorentzVec().Eta()),fabs(leptonSelect[i].lorentzVec().Pt()) ) );
+	    weight *= heIDSF->GetBinContent( hmueTriggerSF->FindBin( leptonSelect[i].lorentzVec().Eta(),fabs(leptonSelect[i].lorentzVec().Pt()) ) );
 	  if (leptonSelect[i].leptonType()=="Muon")
-	    weight *= hmuIDSF->GetBinContent( hmueTriggerSF->FindBin( fabs(leptonSelect[i].lorentzVec().Eta()),fabs(leptonSelect[i].lorentzVec().Pt()) ) );
+	    weight *= hmuIDSF->GetBinContent( hmueTriggerSF->FindBin( leptonSelect[i].lorentzVec().Eta(),fabs(leptonSelect[i].lorentzVec().Pt()) ) );
 	}
       }
       if(debug) cout<< "trigger and ID weights applied" <<endl;
@@ -412,8 +407,26 @@ void Analyzer::Loop() {
       TMT2bb = getMT2bb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
       TMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
 
+      float gMETx = met_genPt*TMath::Cos(met_genPhi);
+      float gMETy = met_genPt*TMath::Sin(met_genPhi);
+      if (genMuon.size()>=2 && genElec.size()<1 && genBquark.size()>1) {
+	GMT2ll = getMT2(genMuon[0], genMuon[1], met_genPt, met_genPhi);
+	GMT2bb = getMT2_80(genBquark[0], genBquark[1], sqrt(pow(gMETx+(genMuon[0]+genMuon[1]).Px(),2)+pow(gMETy+(genMuon[0]+genMuon[1]).Py(),2)), TMath::ATan2(gMETy+(genMuon[0]+genMuon[1]).Py(),gMETx+(genMuon[0]+genMuon[1]).Px()) );
+	//GMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
+      }
+      else if (genMuon.size()<1 && genElec.size()>=2 && genBquark.size()>1) {
+	GMT2ll = getMT2(genElec[0], genElec[1], met_genPt, met_genPhi);
+	GMT2bb = getMT2_80(genBquark[0], genBquark[1], sqrt(pow(gMETx+(genElec[0]+genElec[1]).Px(),2)+pow(gMETy+(genElec[0]+genElec[1]).Py(),2)), TMath::ATan2(gMETy+(genElec[0]+genElec[1]).Py(),gMETx+(genElec[0]+genElec[1]).Px()) );
+	//GMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
+      }
+      else if (genMuon.size()>0 && genElec.size()>0 && genBquark.size()>1) {
+	GMT2ll = getMT2(genMuon[0], genElec[0], met_genPt, met_genPhi);
+	GMT2bb = getMT2_80(genBquark[0], genBquark[1], sqrt(pow(gMETx+(genMuon[0]+genElec[0]).Px(),2)+pow(gMETy+(genMuon[0]+genElec[0]).Py(),2)), TMath::ATan2(gMETy+(genMuon[0]+genElec[0]).Py(),gMETx+(genMuon[0]+genElec[0]).Px()) );
+	//GMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
+      }
+      
       // filling all tree variables
-      if (SaveTree && jetSelect.size()>1 && leptonSelect.size()>1) {
+      if (sysvar==CentralValue && SaveTree && jetSelect.size()>1 && leptonSelect.size()>1) {
 	TWeight = weight;
 	TNPV = numberVertices;
 	TNJets = jetColl[sysvar].size();     
