@@ -5,6 +5,8 @@ float getXS_D(TString MCsample) {
   
   if (MCsample.Contains("TTJets")) 
     eventXS=831.8/89704515;
+  if (MCsample.Contains("TTbar_Powheg"))
+    eventXS=831.8/96834559.;
   if (MCsample.Contains("TTLep_pow")) 
     eventXS=87.3/4997000;
   if (MCsample.Contains("TbarW")) 

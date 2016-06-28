@@ -5,8 +5,8 @@
 
 JetPlots::JetPlots(TString name) : StdPlots(name) {
 
-  h_CombSV                 = new TH1F("h_"+name+"_CombSVtxV2",name+" Comb Inclusive SVtxV2",100,-1,2);
-  h_SC                = new TH1F("h_"+name+"_SC",name+" Combined MVA",100,-1,2);
+  h_CombSV         = new TH1F("h_CombSVtxV2_" +name ,name+" Comb Inclusive SVtxV2",100,-1,2);
+  h_SC             = new TH1F("h_SC_"         +name ,name+" Combined MVA",100,-1,2);
 }
 
 JetPlots::~JetPlots() {

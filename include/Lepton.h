@@ -9,7 +9,7 @@ class Lepton {
   enum FakeType {notfake, unknown, jet, cjet, bjet, chargemisid};
   enum LooseTight {Loose, Tight, Other};
   
- Lepton(LeptonType leptonType00, unsigned int leptonIndex00, TLorentzVector& vLepton00, float& eta00, float& chiNdof00, float& dxy_BS00, float& dz_BS00, int& charge00, FakeType fakeType00, LooseTight looseTight00, float& relIso00)
+ Lepton(LeptonType leptonType00, unsigned int leptonIndex00, TLorentzVector& vLepton00, float& eta00, float& chiNdof00, float& dxy_BS00, float& dz_BS00, int charge00, FakeType fakeType00, LooseTight looseTight00, float& relIso00)
    : leptonType_(leptonType00), leptonIndex_(leptonIndex00), lorentzVec_(vLepton00), eta_(eta00), chiNdof_(chiNdof00), dxy_BS_(dxy_BS00), dz_BS_(dz_BS00), charge_(charge00), fakeType_(fakeType00), looseTight_(looseTight00), relIso_(relIso00) {};
   ~Lepton() {};
 

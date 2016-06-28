@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <sstream>
 
-
 BTagEntry::Parameters::Parameters(
   OperatingPoint op,
   std::string measurement_type,
@@ -73,14 +72,14 @@ throw std::exception();
   }
 
   // make parameters
-  unsigned op = atoi(vec[0].c_str());
+  unsigned op = stoi(vec[0]);
   if (op > 3) {
 std::cerr << "ERROR in BTagCalibration: "
           << "Invalid csv line; OperatingPoint > 3: "
           << csvLine;
 throw std::exception();
   }
-  unsigned jf = atoi(vec[3].c_str());
+  unsigned jf = stoi(vec[3]);
   if (jf > 2) {
 std::cerr << "ERROR in BTagCalibration: "
           << "Invalid csv line; JetFlavor > 2: "
@@ -92,12 +91,12 @@ throw std::exception();
     vec[1],
     vec[2],
     BTagEntry::JetFlavor(jf),
-    atof(vec[4].c_str()),
-    atof(vec[5].c_str()),
-    atof(vec[6].c_str()),
-    atof(vec[7].c_str()),
-    atof(vec[8].c_str()),
-    atof(vec[9].c_str())
+    stof(vec[4]),
+    stof(vec[5]),
+    stof(vec[6]),
+    stof(vec[7]),
+    stof(vec[8]),
+    stof(vec[9])
   );
 }
 
@@ -280,7 +279,7 @@ BTagCalibration::BTagCalibration(const std::string &taggr,
                                  const std::string &filename):
   tagger_(taggr)
 {
-  std::ifstream ifs(filename.c_str());
+  std::ifstream ifs(filename);
   readCSV(ifs);
   ifs.close();
 }
@@ -332,10 +331,10 @@ void BTagCalibration::makeCSV(std::ostream &s) const
 { 
   s << tagger_ << ";" << BTagEntry::makeCSVHeader();
   for (std::map<std::string, std::vector<BTagEntry> >::const_iterator i 
-           = data_.begin(); i != data_.end(); ++i) {
+           = data_.cbegin(); i != data_.cend(); ++i) {
     const std::vector<BTagEntry> &vec = i->second;
     for (std::vector<BTagEntry>::const_iterator j 
-             = vec.begin(); j != vec.end(); ++j) {
+             = vec.cbegin(); j != vec.cend(); ++j) {
       s << j->makeCSVLine();
     }
   }
@@ -369,7 +368,7 @@ BTagCalibrationReader::BTagCalibrationReader(const BTagCalibration* c,
   setupTmpData(c);
 }
 
-double BTagCalibrationReader::eval(BTagEntry::JetFlavor jf,
+double BTagCalibrationReader::evaluate(BTagEntry::JetFlavor jf,
                                    float eta,
                                    float pt,
                                    float discr) const
@@ -398,7 +397,9 @@ double BTagCalibrationReader::eval(BTagEntry::JetFlavor jf,
     }
   }
 
-  return 0.;  // default value
+  //return 0.;  // default value
+  return 1.; // test
+
 }
 
 void BTagCalibrationReader::setupTmpData(const BTagCalibration* c)
@@ -429,6 +430,5 @@ void BTagCalibrationReader::setupTmpData(const BTagCalibration* c)
     }
   }
 }
-
 
 

@@ -161,12 +161,12 @@ public:
                         std::string sysType="central");
   ~BTagCalibrationReader() {}
 
-  double eval(BTagEntry::JetFlavor jf,
+  double evaluate(BTagEntry::JetFlavor jf,
               float eta,
               float pt,
               float discr=0.) const;
 
-protected:
+//protected:
   struct TmpEntry {
     float etaMin;
     float etaMax;
@@ -184,6 +184,5 @@ protected:
 };
 
 #endif  // BTagCalibrationReader_H
-
 
 

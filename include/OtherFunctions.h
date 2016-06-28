@@ -27,6 +27,10 @@ float getMT2bb(std::vector<Jet>& jets, std::vector<Lepton>& leptons, float theME
 
 float getMT2lblb(std::vector<Jet>& jets, std::vector<Lepton>& leptons, float theMET, float theMETphi);
 
+float getDiTopMass(std::vector<Jet>& jets, std::vector<Lepton>& leptons, float MET, float MET_phi);
+
+int nthdigit(int x, int n);
+
 bool LeptonPTSorter(Lepton lep1, Lepton lep2);
 
 bool LeptonIsoSorter(Lepton lep1, Lepton lep2);

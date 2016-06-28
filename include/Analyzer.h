@@ -28,14 +28,13 @@ using namespace std;
 
 class Analyzer : public Data {
 
-
-  static const Bool_t debug = false;
-  static const Bool_t SaveTree = true;
-  static const Bool_t Blind = true;
-  static const Double_t integratedlumi = 1260.;
+  const Bool_t debug = false;
+  const Bool_t SaveTree = true;
+  const Bool_t Blind = true;
+  const Double_t integratedlumi = 1260.;
 //  static const Double_t integratedlumi = 1.0; //for Fakes
-  static const Double_t Mass_Z = 91.1876;
-  static const Double_t Mass_W = 80.398;
+  const Double_t Mass_Z = 91.1876;
+  const Double_t Mass_W = 80.398;
   enum Variation {CentralValue, JetEnUp, JetEnDown, JetResUp, JetResDown, MuonEnUp, MuonEnDow, ElectronEnUp, ElectronEnDown, TauEnUp, TauEnDown, UnclusteredEnUp, UnclusteredEnDown};
 
   //SF parametrization
@@ -52,7 +51,7 @@ class Analyzer : public Data {
   TFile *outfile;
   Long64_t entrieslimit;
   ReweightPU *reweightPU;
-  BTagSFUtil *fBTagSF;
+  BTagSFUtil *BTagSF;
   
   TDirectory *Dir;
   Int_t index;
@@ -74,9 +73,11 @@ class Analyzer : public Data {
   UInt_t ncuts, nchannels, nsystematics;
   vector<Int_t> selectionStep; vector<Int_t> selectChannel; vector<Int_t> selectionStepZDY;
   vector<Lepton> muonColl; vector<Lepton> electronColl;
+  vector<Lepton> genElec, genMuon, genNuElec, genNuMuon;
   vector<Jet> jetColl[14]; vector<Jet> bjetColl[14]; vector<Jet> jetHTColl[14];
-  vector<Jet> jetSelect; vector<Lepton> leptonSelect;
-  vector<TLorentzVector> genElec, genMuon, genBquark, genLightquark;
+  vector<Jet> jetSelect; vector<Jet> jetGenColl; vector<Jet> hardBquark;
+  vector<Lepton> leptonSelect;  vector<Lepton> leptonGenColl;
+  vector<TLorentzVector> genLightquark;
 
   Float_t HT, met_cut;
   Bool_t Zveto;
@@ -85,55 +86,13 @@ class Analyzer : public Data {
  
   
   TH1F *h_prova;
+  TH1F *h_VertexNoReweight, *h_VertexPostReweight;
 
-
+ protected:
   ///Tree for optimization//////
   TFile *outfileTree;
   // Trees
   TTree *AnalysisTree;
-  // Branches
-  int TNPV;
-  int TNJets;     
-  int TNJetsBtag;
-  int TNMuon;
-  int TNElec;
-  float TWeight;
-  float TMET;
-  float TMET_Phi;
-  float THT;
-  float TMT2ll;
-  float TMT2bb;
-  float TMT2lblb;
-  float GMT2ll;
-  float GMT2bb;
-  float GMT2lblb;
-  float TMll;
-  float TPtllb;
-  float TMeff;
-  float TdPhiPtllbMET;
-  float TdPhiJetMet;
-  float TdPhiLepMet;
-  float TdPhiLepJet;
-  float TdPhill;
-  Float_t TMuon_Px[20];
-  Float_t TMuon_Py[20];
-  Float_t TMuon_Pz[20];
-  Float_t TMuon_E[20];
-  Float_t TElec_Px[20];
-  Float_t TElec_Py[20];
-  Float_t TElec_Pz[20];
-  Float_t TElec_E[20];
-  Float_t TJet_Px[50];
-  Float_t TJet_Py[50];
-  Float_t TJet_Pz[50];
-  Float_t TJet_E[50];
-  Float_t TJet_discriminant[50];
-  Float_t TBJet_Px[30];
-  Float_t TBJet_Py[30];
-  Float_t TBJet_Pz[30];
-  Float_t TBJet_E[30];
-  Float_t TMuon_Charge[20];
-  Float_t TElec_Charge[20];
 
   //done optimization tree variables
 

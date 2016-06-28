@@ -7,8 +7,8 @@ using namespace std;
 #include "Lepton.h"
 #include <vector>
 
-static const Float_t Mass_Z = 91.1876;
-static const Float_t Mass_W = 80.398;
+const Float_t Mass_Z = 91.1876;
+const Float_t Mass_W = 80.398;
 
 Bool_t isGoodEvent(Int_t nVertex, std::vector<Float_t> Vertex_Ndof, std::vector<Float_t> Vertex_X,  std::vector<Float_t> Vertex_Y, std::vector<Float_t> Vertex_Z, Float_t beamspot_x, Float_t beamspot_y, Bool_t *goodVerticies);
 

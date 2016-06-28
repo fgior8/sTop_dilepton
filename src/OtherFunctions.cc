@@ -132,6 +132,40 @@ float getMT2_80(TLorentzVector lept1, TLorentzVector lept2, float theMET, float 
   return MT2;
 }
 
+
+float getDiTopMass(std::vector<Jet>& jets, std::vector<Lepton>& leptons, float MET, float MET_phi) {
+  float MT2llbb00, MT2llbb01, MT2llbb;
+  float METx = MET*TMath::Cos(MET_phi);
+  float METy = MET*TMath::Sin(MET_phi);
+  TLorentzVector Lep0 = leptons[0].lorentzVec();
+  TLorentzVector Lep1 = leptons[1].lorentzVec();
+  TLorentzVector BtagJet0 = jets[0].lorentzVec();
+  TLorentzVector BtagJet1 = jets[1].lorentzVec();
+  TLorentzVector LepPlusBtagJet00 = Lep0 + BtagJet0;
+  TLorentzVector LepPlusBtagJet10 = Lep1 + BtagJet0;
+  TLorentzVector LepPlusBtagJet11 = Lep1 + BtagJet1;
+  TLorentzVector LepPlusBtagJet01 = Lep0 + BtagJet1;
+  if (LepPlusBtagJet11.M()<173 && LepPlusBtagJet00.M()<173 && (LepPlusBtagJet10.M()>173 || LepPlusBtagJet01.M()>173))
+    MT2llbb=getMT2(LepPlusBtagJet00, LepPlusBtagJet11, MET, MET_phi);
+  else if ((LepPlusBtagJet11.M()>173 || LepPlusBtagJet00.M()>173) && LepPlusBtagJet10.M()<173 && LepPlusBtagJet01.M()<173)
+    MT2llbb=getMT2(LepPlusBtagJet01, LepPlusBtagJet10, MET, MET_phi);
+  else if (LepPlusBtagJet11.M()<173 && LepPlusBtagJet00.M()<173 && LepPlusBtagJet10.M()<173 && LepPlusBtagJet01.M()<173) {
+    if ( fabs(LepPlusBtagJet11.M()-LepPlusBtagJet00.M()) < fabs(LepPlusBtagJet10.M()-LepPlusBtagJet01.M()) )
+      MT2llbb=getMT2(LepPlusBtagJet00, LepPlusBtagJet11, MET, MET_phi);
+    else
+      MT2llbb=getMT2(LepPlusBtagJet01, LepPlusBtagJet10, MET, MET_phi);
+  }
+  else
+    MT2llbb=0;
+  return MT2llbb;
+}
+
+
+int nthdigit(int x, int n) {
+  static int powersof10[] = {1, 10, 100, 1000, 10000, 100000};
+  return ((x / powersof10[n]) % 10);
+}
+
 bool LeptonPTSorter(Lepton lep1, Lepton lep2) {
   return lep1.lorentzVec().Pt() > lep2.lorentzVec().Pt();
 }

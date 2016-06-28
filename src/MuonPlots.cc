@@ -5,11 +5,11 @@
 
 MuonPlots::MuonPlots(TString name) : StdPlots(name) {
 
-  h_charge             = new TH1F("h_"+name+"_charge","Charge of "+name,5,-2,3);
-  h_PF_RelIso          = new TH1F("h_"+name+"_PF_RelIso",name+" Particle Flow RelIso",100,0.,1.);
-  h_GlbChi2            = new TH1F("h_"+name+"_GlbChi2",name+" Global #chi^{2} per #DoF",120,0.,12.);
-  h_dxy                = new TH1F("h_"+name+"_dxy",name+" transverse IP",300,0.0,0.3);
-  h_dz                 = new TH1F("h_"+name+"_dz",name+" longitudinal IP",100,0.0,1.0);
+  h_charge             = new TH1F("h_charge_"    +name  ,"Charge of "+name,5,-2,3);
+  h_PF_RelIso          = new TH1F("h_PF_RelIso_" +name  ,name+" Particle Flow RelIso",100,0.,1.);
+  h_GlbChi2            = new TH1F("h_GlbChi2_"   +name  ,name+" Global #chi^{2} per #DoF",120,0.,12.);
+  h_dxy                = new TH1F("h_dxy_"       +name  ,name+" transverse IP",300,0.0,0.3);
+  h_dz                 = new TH1F("h_dz_"        +name  ,name+" longitudinal IP",100,0.0,1.0);
 }
 
 MuonPlots::~MuonPlots() {

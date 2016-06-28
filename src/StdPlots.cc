@@ -2,10 +2,10 @@
 
 StdPlots::StdPlots(TString name) {  
 
-  h_particles = new TH1F("h_"+name+"_N"  , "Number of "+name,   20,0,20);
-  h_pt        = new TH1F("h_"+name+"_pt" , name+" p_{t} (GeV)", 100,0,1000);
-  h_eta       = new TH1F("h_"+name+"_eta", name+" #eta",        100,-5,5);
-  h_phi       = new TH1F("h_"+name+"_phi", name+" #phi",        100,-3.1415926535,3.1415926535);
+  h_particles = new TH1F("h_N_"  +name  , "Number of "+name,   20,0,20);
+  h_pt        = new TH1F("h_pt_" +name  , name+" p_{t} (GeV)", 100,0,1000);
+  h_eta       = new TH1F("h_eta_"+name  , name+" #eta",        100,-5,5);
+  h_phi       = new TH1F("h_phi_" +name  , name+" #phi",        100,-3.1415926535,3.1415926535);
 
 }
 

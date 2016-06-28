@@ -1,4 +1,4 @@
-#include "Analyzer.h"
+#include "ResAnalyzer.h"
 #include "ChainMaker.h"
 
 void display_usage() {
@@ -14,7 +14,7 @@ int main (int argc, const char* argv[]) {
 
   const char * _output   = 0;
   const char * _input    = 0;
-  const char * _dir      = "./DataSetList/";
+  const char * _dir      = "./trees/";
   const char * _version  = 0;
   const char * _nevents  = 0;
   
@@ -72,17 +72,15 @@ int main (int argc, const char* argv[]) {
   Int_t ver = atoi (_version);
   Long64_t nev = atol (_nevents);
 
-  Analyzer Pippo;
-  cout << "fname " << fname << endl;
+ 
   fdir.Append(fname);
-  cout << "Running on " << fdir << endl;
-  TChain* chain = ChainMaker(fdir);
-  Pippo.Init(chain); 
-  Pippo.SetName(hname,ver);
-  Pippo.SetEvtN(nev);
-  Pippo.SetWeight(hname);
-  cout << "Saved in " << hname << endl;  
+  TChain* chain = new TChain("sTopTree");
+  chain->Add(fdir);
+  ResAnalyzer Pippo;
+  Pippo.Init(chain);
+  Pippo.SetName(hname,1);
   Pippo.Loop();
+
 
 cout << endl << endl;
 }

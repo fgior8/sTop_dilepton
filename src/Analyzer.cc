@@ -1,4 +1,5 @@
 #include "Analyzer.h"
+#include "FillTandG.h"
 
 Analyzer::Analyzer() {
 
@@ -35,6 +36,8 @@ Analyzer::Analyzer() {
     cout << "ERROR [MuonElectronSF]: Could not find histogram for SF reweighting" << endl;
   
   h_prova = new TH1F("h_prova","p_T",100,0,1000);
+  h_VertexNoReweight = new TH1F("h_VertexNoReweight","n Vertices no reweighted", 60,0,60);
+  h_VertexPostReweight = new TH1F("h_VertexPostReweight","n Vertices reweighted", 60,0,60);
  
   ncuts=6;
   nchannels=5;
@@ -120,62 +123,13 @@ void Analyzer::SetEvtN(Long64_t events) {
 }
 
 void Analyzer::Loop() {
-
-  if (SaveTree) {
-    if (debug) cout<< "inizializing tree" <<endl;
-    ///Initialize tree for optimization
-    AnalysisTree = new TTree("sTopTree","Optimization tree");
-    AnalysisTree->Branch("TWeight",&TWeight,"TWeight/F");
-    AnalysisTree->Branch("TNPV",&TNPV,"TNPV/I");
-    AnalysisTree->Branch("TMET",&TMET,"TMET/F");
-    AnalysisTree->Branch("TMET_Phi",&TMET_Phi,"TMET_Phi/F");
-    AnalysisTree->Branch("TMT2ll",&TMT2ll,"TMT2ll/F");
-    AnalysisTree->Branch("TMT2bb",&TMT2bb,"TMT2bb/F");
-    AnalysisTree->Branch("TMT2lblb",&TMT2lblb,"TMT2lblb/F");
-    AnalysisTree->Branch("GMT2ll",&GMT2ll,"GMT2ll/F");
-    AnalysisTree->Branch("GMT2bb",&GMT2bb,"GMT2bb/F");
-    AnalysisTree->Branch("GMT2lblb",&GMT2lblb,"GMT2lblb/F");
-    AnalysisTree->Branch("THT",&THT,"THT/F");
-    AnalysisTree->Branch("TMll",&TMll,"TMll/F");
-    AnalysisTree->Branch("TMeff",&TMeff,"TMeff/F");
-    AnalysisTree->Branch("TPtllb",&TPtllb,"TPtllb/F");
-    AnalysisTree->Branch("TdPhiPtllbMET",&TdPhiPtllbMET,"TdPhiPtllbMET/F");
-    AnalysisTree->Branch("TdPhiJetMet",&TdPhiJetMet,"TdPhiJetMet/F");
-    AnalysisTree->Branch("TdPhiLepMet",&TdPhiLepMet,"TdPhiLepMet/F");
-    AnalysisTree->Branch("TdPhiLepJet",&TdPhiLepJet,"TdPhiLepJet/F");
-    AnalysisTree->Branch("TdPhill",&TdPhill,"TdPhill/F");
-    AnalysisTree->Branch("TNMuon",&TNMuon,"TNMuon/I");
-    AnalysisTree->Branch("TNElec",&TNElec,"TNElec/I");
-    AnalysisTree->Branch("TNJets",&TNJets,"TNJets/I");
-    AnalysisTree->Branch("TNJetsBtag",&TNJetsBtag,"TNJetsBtag/I");
-    if (debug) cout<< "inizializing variables for TLorentz vectors" <<endl;
-    AnalysisTree->Branch("TMuon_Charge", TMuon_Charge, "TMuon_Charge[TNMuon]/F");
-    AnalysisTree->Branch("TMuon_Px", TMuon_Px, "TMuon_Px[TNMuon]/F");
-    AnalysisTree->Branch("TMuon_Py", TMuon_Py, "TMuon_Py[TNMuon]/F");
-    AnalysisTree->Branch("TMuon_Pz", TMuon_Pz, "TMuon_Pz[TNMuon]/F");
-    AnalysisTree->Branch("TMuon_E", TMuon_E, "TMuon_E[TNMuon]/F");
-    AnalysisTree->Branch("TElec_Charge", TElec_Charge, "TElec_Charge[TNElec]/F");
-    AnalysisTree->Branch("TElec_Px", TElec_Px, "TElec_Px[TNElec]/F");
-    AnalysisTree->Branch("TElec_Py", TElec_Py, "TElec_Py[TNElec]/F");
-    AnalysisTree->Branch("TElec_Pz", TElec_Pz, "TElec_Pz[TNElec]/F");
-    AnalysisTree->Branch("TElec_E", TElec_E, "TElec_E[TNElec]/F");
-    AnalysisTree->Branch("TJet_discriminant", TJet_discriminant, "TJet_discriminant[TNJets]/F");
-    AnalysisTree->Branch("TJet_Px", TJet_Px, "TJet_Px[TNJets]/F");
-    AnalysisTree->Branch("TJet_Py", TJet_Py, "TJet_Py[TNJets]/F");
-    AnalysisTree->Branch("TJet_Pz", TJet_Pz, "TJet_Pz[TNJets]/F");
-    AnalysisTree->Branch("TJet_E", TJet_E, "TJet_E[TNJets]/F");
-    AnalysisTree->Branch("TBJet_Px", TBJet_Px, "TBJet_Px[TNJetsBtag]/F");
-    AnalysisTree->Branch("TBJet_Py", TBJet_Py, "TBJet_Py[TNJetsBtag]/F");
-    AnalysisTree->Branch("TBJet_Pz", TBJet_Pz, "TBJet_Pz[TNJetsBtag]/F");
-    AnalysisTree->Branch("TBJet_E", TBJet_E, "TBJet_E[TNJetsBtag]/F");
-  }
-  //// done initialization
-
+  AnalysisTree = new TTree("sTopTree","Optimization tree");
+  FillTandG TangG(AnalysisTree);
   cout << "total number of entries " <<nentries<<endl;
 
   if (debug) cout<< "loop begins" <<endl;
 
-  fBTagSF = new BTagSFUtil("comb", "CSVv2", "Medium", 0, "", 123);
+  BTagSF = new BTagSFUtil("mujets", "CSVv2", "Loose");
 
   if(!MCweight) MCweight=1;   
   weight=MCweight;
@@ -198,9 +152,14 @@ void Analyzer::Loop() {
     if (!fChain) cout<<"problems with the input file"<<endl;
     fChain->GetEntry(jentry);
 
+
+    /// T2tt  SELECT MASS POINT ///
+    //if (fabs(GenSusyMScan1-950)>110) continue;  //Stop mass
+    //if (fabs(GenSusyMScan2-450)>110) continue;  //LSP mass
+
     weight = MCweight;
  
-    /// only for MC at NLO normalization ///
+    /// only for MC atNLO normalization ///
     if (MCatNLO && !isData) weight *= genWeight;
     
     // MET filters for now all OFF
@@ -218,14 +177,21 @@ void Analyzer::Loop() {
     if (!isData) {
       //weight *= puWeight;
       /// ***PU reweghting*** ///
-      //h_nvtx_norw->Fill(PileUpInteractionsTrue->at(0), MCweight);
+      h_VertexNoReweight->Fill(numberVertices, weight);
       weight *= reweightPU->GetWeight(nTrueInt);
-      //h_nvtx_rw->Fill(PileUpInteractionsTrue->at(0), weight);
+      h_VertexPostReweight->Fill(numberVertices, weight);
     }
 
     if(debug) cout<< "object selection" <<endl;
-    muonColl.clear();    electronColl.clear();
-    genElec.clear(); genMuon.clear(); genBquark.clear(); genLightquark.clear();
+    
+    //cleaning all collections at the beginning of each event///
+    muonColl.clear(); electronColl.clear();
+    genElec.clear(); genMuon.clear(); hardBquark.clear(); genLightquark.clear();
+    jetGenColl.clear(); leptonGenColl.clear();
+    ///cleaning vectors//
+    for (UInt_t kk=0;kk<nsystematics+1;kk++) {//nsystematics
+      jetColl[kk].clear();    bjetColl[kk].clear(); jetHTColl[kk].clear();
+    }
     
     Muon.SetPt(15);
     Muon.SetEta(2.4);
@@ -241,23 +207,45 @@ void Analyzer::Loop() {
     Electron.SetBSdxy(0.02);
     Electron.SetBSdz(0.10);
     Electron.ElectronSelection(nLepGood, LepGood_pdgId, LepGood_etaSc, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_convVeto, LepGood_lostHits, LepGood_dEtaScTrkIn, LepGood_dPhiScTrkIn, LepGood_sigmaIEtaIEta, LepGood_hadronicOverEm, LepGood_eInvMinusPInv, LepGood_dxy, LepGood_dz, electronColl);
-    
-    ///cleaning vectors//
-    for (UInt_t kk=0;kk<nsystematics+1;kk++) {//nsystematics
-      jetColl[kk].clear();    bjetColl[kk].clear(); jetHTColl[kk].clear();
+
+    // check MC matching ID
+    if (!isData && false) {
+      for (UInt_t i=0;i<electronColl.size();i++) {
+	if (fabs(LepGood_mcMatchPdgId[electronColl[i].ilepton()]!=11))
+	  electronColl.erase(electronColl.begin()+i);
+      }
+      for (UInt_t i=0;i<muonColl.size();i++) {
+	if (fabs(LepGood_mcMatchPdgId[muonColl[i].ilepton()]!=13))
+	  muonColl.erase(muonColl.begin()+i);
+      }
     }
+
+    GenPart.GenPartSelection(nGenPart, GenPart_pdgId, GenPart_status, GenPart_motherId, GenPart_grandmotherId, GenPart_sourceId, GenPart_charge, GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, genElec, genNuElec, genMuon, genNuMuon, hardBquark, genLightquark);
+    
     if(debug) cout<< "selecting jets" <<endl;
     Float_t tmp_sys[] = {0,0};
     Jets.SetPt(10);
     Jets.SetEta(5.0);
-    Jets.JetSelectionLeptonVeto_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCMVA, electronColl, muonColl, jetHTColl);
+    Jets.JetSelectionLeptonVeto_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCMVA, Jet_hadronFlavour, electronColl, muonColl, jetHTColl);
     
     Jets.SetPt(30);
     Jets.SetEta(2.4);
     Jets.SetBdisc(0.605);
-    Jets.JetSelectionLeptonVeto_andB_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCSV, electronColl, muonColl, jetColl, bjetColl);
+    Jets.JetSelectionLeptonVeto_andB_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCSV, Jet_hadronFlavour, electronColl, muonColl, jetColl, bjetColl);
 
-    GenPart.GenPartSelection(nGenPart, GenPart_pdgId, GenPart_status, GenPart_motherId, GenPart_grandmotherId, GenPart_charge, GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, genElec, genMuon, genBquark, genLightquark);
+    bjetColl[0].clear();
+    for(UInt_t i=0;i<jetColl[0].size();i++) {
+      if (!(fabs(Jet_mcFlavour[jetColl[0][i].ijet()])==5 && fabs(Jet_hadronFlavour[jetColl[0][i].ijet()])==5))
+	jetColl[0].erase(jetColl[0].begin()+i);
+      if(isData) {
+	if( BTagSF->IsTagged(jetColl[0][i].btag_disc(), -999999, jetColl[0][i].lorentzVec().Pt(), jetColl[0][i].lorentzVec().Eta()) )
+	  bjetColl[0].push_back(jetColl[0][i]);
+      }
+      else {
+	if( BTagSF->IsTagged(jetColl[0][i].btag_disc(), jetColl[0][i].flavour(), jetColl[0][i].lorentzVec().Pt(), jetColl[0][i].lorentzVec().Eta()) )
+	  bjetColl[0].push_back(jetColl[0][i]);
+      }
+    }
    
     if(debug) cout<< "DONE object selection" <<endl;
     for (Variation sysvar=(Analyzer::Variation)0;sysvar<nsystematics+1;sysvar=(Analyzer::Variation)(sysvar+1)) {
@@ -304,7 +292,7 @@ void Analyzer::Loop() {
 
       //Making leptons and jets selected collections
       // it seems more convinent to take only two leptons, once the triggers are set we need to add the here FIXME 
-      if (muonColl.size()==2 && electronColl.size()==0 && HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v>0 && (!isData || isDoubleMu)) {
+      if (muonColl.size()==2 && electronColl.size()==0 && (!isData || isDoubleMu) ) {//&& HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v>0 ) {
 	invMtemp=0;
 	if (muonColl[0].charge()*muonColl[1].charge()<0 && muonColl[0].lorentzVec().Pt()>20) 
 	  invMtemp = (muonColl[0].lorentzVec()+muonColl[1].lorentzVec()).M();
@@ -316,7 +304,7 @@ void Analyzer::Loop() {
 	  selectChannel.push_back(3);
 	}
       }
-      if (electronColl.size()==2 && muonColl.size()==0 && HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v>0 && (!isData || isDoubleEl)) {
+      if (electronColl.size()==2 && muonColl.size()==0 && (!isData || isDoubleEl) ) { //&& HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v>0 ) {
 	invMtemp=0;
 	if (electronColl[0].charge()*electronColl[1].charge()<0 && electronColl[0].lorentzVec().Pt()>20) 
 	  invMtemp = (electronColl[0].lorentzVec()+electronColl[1].lorentzVec()).M();
@@ -329,7 +317,7 @@ void Analyzer::Loop() {
 	  selectChannel.push_back(2);
 	}
       }
-      if (muonColl.size()==1 && electronColl.size()==1 && (HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v>0 || HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v) && (!isData || isMuEG)) {
+      if (muonColl.size()==1 && electronColl.size()==1 && (!isData || isMuEG) ) { //&& (HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v>0 || HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v) ) {
 	invMtemp=0;
 	if (muonColl[0].charge()*electronColl[0].charge()<0 && (electronColl[0].lorentzVec().Pt()>20 || muonColl[0].lorentzVec().Pt()>20)) 
 	  invMtemp = (muonColl[0].lorentzVec()+electronColl[0].lorentzVec()).M();
@@ -341,10 +329,8 @@ void Analyzer::Loop() {
 	  selectChannel.push_back(4);
 	}
       }
-
       if (leptonSelect.size()<2) continue; // no less than two leptons
       if(debug) cout<< "two leptons found" <<endl;
-
 
       // applying scaling factor for ID and triggers (now that we have selected the event type)
       if (!isData && sysvar==CentralValue && true) {
@@ -353,9 +339,9 @@ void Analyzer::Loop() {
       
 	//ID SF applied per lepton
 	for (UInt_t i=0; i<leptonSelect.size(); i++) {
-	  if (leptonSelect[i].leptonType()=="Electron")
+	  if (leptonSelect[i].leptonType()==1)
 	    weight *= heIDSF->GetBinContent( hmueTriggerSF->FindBin( leptonSelect[i].lorentzVec().Eta(),fabs(leptonSelect[i].lorentzVec().Pt()) ) );
-	  if (leptonSelect[i].leptonType()=="Muon")
+	  if (leptonSelect[i].leptonType()==0)
 	    weight *= hmuIDSF->GetBinContent( hmueTriggerSF->FindBin( leptonSelect[i].lorentzVec().Eta(),fabs(leptonSelect[i].lorentzVec().Pt()) ) );
 	}
       }
@@ -371,9 +357,9 @@ void Analyzer::Loop() {
       for (UInt_t n=0;n<selectChannel.size();n++) {
 	UInt_t channel = selectChannel[n];
 	if (sysvar==CentralValue)
-	  h_signal[1][channel]->Fill(numberVertices, valueMET[sysvar], valueMETPhi[sysvar], HT, leptonSelect, jetSelect, weight, channel, 1);
+	  h_signal[1][channel]->Fill(numberVertices, valueMET[sysvar], valueMETPhi[sysvar], leptonSelect, jetSelect, weight, channel, 1);
 	else
-	  h_systematics[1][channel][sysvar-1]->Fill(numberVertices, valueMET[sysvar], valueMETPhi[sysvar], HT, leptonSelect, jetSelect, weight, channel, 1);
+	  h_systematics[1][channel][sysvar-1]->Fill(numberVertices, valueMET[sysvar], valueMETPhi[sysvar], leptonSelect, jetSelect, weight, channel, 1);
 	
 	if (sysvar==CentralValue) h_ZDYplots[1][channel]->Fill(leptonSelect, weight, Zveto); //ZDY plot only for re-normalization
       }
@@ -403,79 +389,35 @@ void Analyzer::Loop() {
 
       if (debug) cout << "two jets CHECKED" << endl;
 
-      TMT2ll = getMT2(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec(), valueMET[0], valueMETPhi[0]);
-      TMT2bb = getMT2bb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
-      TMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
+      //  GenPart.GenJetSelection(Jet_mcPx, Jet_mcPy, Jet_mcPz, Jet_mcEnergy, Jet_mcFlavour, hardBquark, jetSelect, jetGenColl);
+      TLorentzVector lVec;
+      Float_t dummy = 0.0;
+      for (UInt_t i=0; i<2; i++) {
+	lVec.SetPxPyPzE(Jet_mcPx[jetSelect[i].ijet()],Jet_mcPy[jetSelect[i].ijet()],Jet_mcPz[jetSelect[i].ijet()],Jet_mcEnergy[jetSelect[i].ijet()]);
+	jetGenColl.push_back( Jet(lVec, Jet_mcFlavour[jetSelect[i].ijet()], 0.0, jetSelect[i].ijet()) );
+	lVec.SetPxPyPzE(LepGood_mcPx[leptonSelect[i].ilepton()],LepGood_mcPy[leptonSelect[i].ilepton()],LepGood_mcPz[leptonSelect[i].ilepton()],LepGood_mcEnergy[leptonSelect[i].ilepton()]);
+	leptonGenColl.push_back( Lepton(leptonSelect[i].leptonType(), leptonSelect[i].ilepton(), lVec, dummy, dummy, dummy, dummy, leptonSelect[i].charge(), leptonSelect[i].fakeType(), leptonSelect[i].looseTight(), dummy) );
+      }
 
-      float gMETx = met_genPt*TMath::Cos(met_genPhi);
-      float gMETy = met_genPt*TMath::Sin(met_genPhi);
-      if (genMuon.size()>=2 && genElec.size()<1 && genBquark.size()>1) {
-	GMT2ll = getMT2(genMuon[0], genMuon[1], met_genPt, met_genPhi);
-	GMT2bb = getMT2_80(genBquark[0], genBquark[1], sqrt(pow(gMETx+(genMuon[0]+genMuon[1]).Px(),2)+pow(gMETy+(genMuon[0]+genMuon[1]).Py(),2)), TMath::ATan2(gMETy+(genMuon[0]+genMuon[1]).Py(),gMETx+(genMuon[0]+genMuon[1]).Px()) );
-	//GMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
-      }
-      else if (genMuon.size()<1 && genElec.size()>=2 && genBquark.size()>1) {
-	GMT2ll = getMT2(genElec[0], genElec[1], met_genPt, met_genPhi);
-	GMT2bb = getMT2_80(genBquark[0], genBquark[1], sqrt(pow(gMETx+(genElec[0]+genElec[1]).Px(),2)+pow(gMETy+(genElec[0]+genElec[1]).Py(),2)), TMath::ATan2(gMETy+(genElec[0]+genElec[1]).Py(),gMETx+(genElec[0]+genElec[1]).Px()) );
-	//GMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
-      }
-      else if (genMuon.size()>0 && genElec.size()>0 && genBquark.size()>1) {
-	GMT2ll = getMT2(genMuon[0], genElec[0], met_genPt, met_genPhi);
-	GMT2bb = getMT2_80(genBquark[0], genBquark[1], sqrt(pow(gMETx+(genMuon[0]+genElec[0]).Px(),2)+pow(gMETy+(genMuon[0]+genElec[0]).Py(),2)), TMath::ATan2(gMETy+(genMuon[0]+genElec[0]).Py(),gMETx+(genMuon[0]+genElec[0]).Px()) );
-	//GMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
-      }
-      
+      if (debug) cout << "gen jets and leptons CHECKED" << endl;
+
+      float vetoMT2ll = getMT2(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec(), valueMET[0], valueMETPhi[0]);
+      float vetoMT2bb = getMT2bb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
+      float vetoMT2lblb = getMT2lblb(jetSelect, leptonSelect, valueMET[0], valueMETPhi[0]);
+
       // filling all tree variables
-      if (sysvar==CentralValue && SaveTree && jetSelect.size()>1 && leptonSelect.size()>1) {
-	TWeight = weight;
-	TNPV = numberVertices;
-	TNJets = jetColl[sysvar].size();     
-	TNJetsBtag = bjetColl[sysvar].size();
-	TNMuon = muonColl.size();
-	TNElec = electronColl.size();
-	TMET = valueMET[0];
-	TMET_Phi = valueMETPhi[0];
-	THT = HT;
-	
-	TMll = (leptonSelect[0].lorentzVec()+leptonSelect[1].lorentzVec()).M();
-	TPtllb = getllmetVector(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec(), valueMET[0], valueMETPhi[0]).Pt();
-	TMeff = getMeff(jetSelect, leptonSelect, valueMET[0]);
-	TdPhiPtllbMET = getdPhiPtllbMet(getllmetVector(leptonSelect[0].lorentzVec(), leptonSelect[1].lorentzVec(), valueMET[0], valueMETPhi[0]), valueMET[0], valueMETPhi[0]);
-	TdPhiJetMet = getdPhiJetMet(jetSelect, valueMET[0], valueMETPhi[0]); //Closest Jet
-	TdPhiLepMet = getdPhiLepMet(leptonSelect[0].lorentzVec(), valueMET[0], valueMETPhi[0]);
-	TdPhiLepJet = leptonSelect[0].lorentzVec().DeltaPhi(jetSelect[0].lorentzVec());
-	TdPhill = leptonSelect[0].lorentzVec().DeltaPhi(leptonSelect[1].lorentzVec());
-	for (Int_t i=0; i<muonColl.size(); i++) {
-	  TMuon_Charge[i] = muonColl[i].charge();
-	  TMuon_Px[i] = muonColl[i].lorentzVec().Px();
-	  TMuon_Py[i] = muonColl[i].lorentzVec().Py();
-	  TMuon_Pz[i] = muonColl[i].lorentzVec().Pz();
-	  TMuon_E[i] = muonColl[i].lorentzVec().E();
-	}
-	for (UInt_t i=0; i<electronColl.size(); i++) {
-	  TElec_Charge[i] = electronColl[i].charge();
-	  TElec_Px[i] = electronColl[i].lorentzVec().Px();
-	  TElec_Py[i] = electronColl[i].lorentzVec().Py();
-	  TElec_Pz[i] = electronColl[i].lorentzVec().Pz();
-	  TElec_E[i] = electronColl[i].lorentzVec().E();
-	}
-	for (int i=0; i<jetColl[sysvar].size(); i++) {
-	  TJet_discriminant[i] = jetColl[sysvar][i].btag_disc();
-	  TJet_Px[i] = jetColl[sysvar][i].lorentzVec().Px();
-	  TJet_Py[i] = jetColl[sysvar][i].lorentzVec().Py();
-	  TJet_Pz[i] = jetColl[sysvar][i].lorentzVec().Pz();
-	  TJet_E[i] = jetColl[sysvar][i].lorentzVec().E();
-	}
-	for (int i=0; i<bjetColl[sysvar].size(); i++) {
-	  TBJet_Px[i] = bjetColl[sysvar][i].lorentzVec().Px();
-	  TBJet_Py[i] = bjetColl[sysvar][i].lorentzVec().Py();
-	  TBJet_Pz[i] = bjetColl[sysvar][i].lorentzVec().Pz();
-	  TBJet_E[i] = bjetColl[sysvar][i].lorentzVec().E();		
-	}
-	AnalysisTree->Fill();	
-      } /// filled the tree
+      if (sysvar==CentralValue && SaveTree) {
+	//	if (!isData && (genElec.size()>0 || genMuon.size()>0) )
+	TangG.SetGenVariables(AnalysisTree, genElec, genNuElec, genMuon, genNuMuon, hardBquark, leptonGenColl, jetGenColl, met_genPt, met_genPhi);
+	//	if (jetSelect.size()>1 && leptonSelect.size()>1) 
+	TangG.SetRecoVariables(AnalysisTree, weight, numberVertices, jetSelect, leptonSelect, valueMET[0], valueMETPhi[0], HT, muonColl, electronColl, jetColl[0], bjetColl[0]);
+	TangG.FillVariables(AnalysisTree);
+      }
+      /// filled the tree
+      if (debug) cout << "-- tree filled --" << endl;
 
-      if (Blind && (TMT2ll>80 || TMT2bb>180 || TMT2lblb>180)) continue;
+
+      if (Blind && (vetoMT2ll>80 || vetoMT2bb>180 || vetoMT2lblb>180)) continue;
       
       met_cut = 40;
 
@@ -514,7 +456,7 @@ void Analyzer::Loop() {
 	  for (UInt_t m=0;m<selectionStep.size();m++) {
 	    cut = selectionStep[m];
 	    
-	    h_signal[cut][channel]->Fill(numberVertices, valueMET[sysvar], valueMETPhi[sysvar], HT, leptonSelect, jetSelect, weight, channel, cut);
+	    h_signal[cut][channel]->Fill(numberVertices, valueMET[sysvar], valueMETPhi[sysvar], leptonSelect, jetSelect, weight, channel, cut);
 	    for (Int_t i=0; i<muonColl.size(); i++) {
 	      index=muonColl[i].ilepton();
 	      h_muons[cut][channel]->Fill(weight, (Int_t) muonColl.size(), muonColl[i].lorentzVec(), muonColl[i].charge(), muonColl[i].relIso(), muonColl[i].chiNdof(), muonColl[i].dxy_BS(), muonColl[i].dz_BS());
@@ -557,13 +499,15 @@ void Analyzer::Loop() {
   if(debug) cout<< "out of the loop" <<endl;
   if (SaveTree) {
     outfileTree->cd();
-    AnalysisTree->Write();
+    TangG.WriteVariables(AnalysisTree);
     outfileTree->Close();
     cout<<"tree written."<<endl;
   }
 
   outfile->cd();
   h_prova->Write();
+  h_VertexNoReweight->Write();
+  h_VertexPostReweight->Write();
   Dir = outfile->mkdir("Signal");
   Dir = outfile->mkdir("Muons");
   Dir = outfile->mkdir("Electrons");
