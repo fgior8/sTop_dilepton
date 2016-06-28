@@ -1,0 +1,9 @@
+/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/TTbar_Powheg_7_4_12_patch4/TTbar_Powheg_0.root
+/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/TTbar_Powheg_7_4_12_patch4/TTbar_Powheg_1.root
+/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/TTbar_Powheg_7_4_12_patch4/TTbar_Powheg_2.root
+/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/TTbar_Powheg_7_4_12_patch4/TTbar_Powheg_3.root
+/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/TTbar_Powheg_7_4_12_patch4/TTbar_Powheg_4.root
+/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/TTbar_Powheg_7_4_12_patch4/TTbar_Powheg_5.root
+/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/TTbar_Powheg_7_4_12_patch4/TTbar_Powheg_6.root
+/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/TTbar_Powheg_7_4_12_patch4/TTbar_Powheg_7.root
+/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/TTbar_Powheg_7_4_12_patch4/TTbar_Powheg_8.root

@@ -1,3 +1,3 @@
-/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_DYJetsToLL_M50_1.root
-/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_DYJetsToLL_M50_0.root
-/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_DYJetsToLL_M50_2.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_DYJetsToLL_M50_aMCatNLO_1.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_DYJetsToLL_M50_aMCatNLO_0.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/oct27/27Oct2015//Tree_DYJetsToLL_M50_aMCatNLO_2.root
