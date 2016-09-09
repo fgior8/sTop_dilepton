@@ -71,16 +71,16 @@ int main (int argc, const char* argv[]) {
   TString fdir(_dir);
   Int_t ver = atoi (_version);
   Long64_t nev = atol (_nevents);
-
+  Long64_t eventProcessed=0;
   Analyzer Pippo;
   cout << "fname " << fname << endl;
   fdir.Append(fname);
   cout << "Running on " << fdir << endl;
-  TChain* chain = ChainMaker(fdir);
+  TChain* chain = ChainMaker(fdir, eventProcessed);
   Pippo.Init(chain); 
   Pippo.SetName(hname,ver);
   Pippo.SetEvtN(nev);
-  Pippo.SetWeight(hname);
+  Pippo.SetWeight(hname, eventProcessed);
   cout << "Saved in " << hname << endl;  
   Pippo.Loop();
 

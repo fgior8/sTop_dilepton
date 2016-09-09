@@ -51,12 +51,13 @@ void ResAnalyzer::Loop() {
     leptonType = Lepton::Muon;
 
     TLorentzVector GJet1, TJet1, lVec;
-    vector<Jet> TJets;
     vector<Jet> TBJets;
+    vector<Lepton> GLeptons;
+    vector<Lepton> HLeptons;
     vector<Jet> GJets;
+    vector<Jet> HBJets;	
     vector<Jet> jetSelect;
     vector<Lepton> leptonSelect;
-    vector<Lepton> GLeptons;
     Int_t charge=0;	
     for (UInt_t i=0; i<TNLepSel; i++) {
       lVec.SetPxPyPzE(TLepSel_Px[i],TLepSel_Py[i],TLepSel_Pz[i],TLepSel_E[i]);
@@ -71,47 +72,30 @@ void ResAnalyzer::Loop() {
 	TBJets.push_back( Jet(TJet1, -999, TJet_discriminant[i], i) );
       jetSelect.push_back( Jet(lVec, discriminant, 0.0, i) );
     }
-    /*    
-    for (UInt_t i=0; i<TNJets; i++) {
-      TJet1.SetPxPyPzE(TJet_Px[i],TJet_Py[i],TJet_Pz[i],TJet_E[i]);
-      TJets.push_back( Jet(TJet1, -999, TJet_discriminant[i], i) );
-    }
-    */
-    if (debug) cout << "TJets done" << endl;
     for (UInt_t i=0; i<GNJets; i++) {
       GJet1.SetPxPyPzE(GJet_Px[i],GJet_Py[i],GJet_Pz[i],GJet_E[i]);
       GJets.push_back( Jet(GJet1, -999, GJet_discriminant[i], i) );
     }
     for (UInt_t i=0; i<GNElec; i++) {
       lVec.SetPxPyPzE(GElec_Px[i],GElec_Py[i],GElec_Pz[i],GElec_E[i]);
-      GLeptons.push_back( Lepton(leptonType, i, lVec, TLepSel_Pz[i], TLepSel_Pz[i], TLepSel_Pz[i], TLepSel_Pz[i], charge, fakeType, looseTight, TLepSel_Pz[i]) );
+      if (lVec.Pt()>0)
+	GLeptons.push_back( Lepton(leptonType, i, lVec, TLepSel_Pz[i], TLepSel_Pz[i], TLepSel_Pz[i], TLepSel_Pz[i], charge, fakeType, looseTight, TLepSel_Pz[i]) );
     }
     if (debug) cout << "Gen done" << endl;
+    ////HARD scattering process
+    for (UInt_t i=0; i<HNBJets; i++) {
+      GJet1.SetPxPyPzE(HBJet_Px[i],HBJet_Py[i],HBJet_Pz[i],HBJet_E[i]);
+      HBJets.push_back( Jet(GJet1, -999, HBJet_discriminant[i], i) );
+    }
+    for (UInt_t i=0; i<HNElec; i++) {
+      lVec.SetPxPyPzE(HElec_Px[i],HElec_Py[i],HElec_Pz[i],HElec_E[i]);
+      if (lVec.Pt()>0)
+	HLeptons.push_back( Lepton(leptonType, i, lVec, TLepSel_Pz[i], TLepSel_Pz[i], TLepSel_Pz[i], TLepSel_Pz[i], charge, fakeType, looseTight, TLepSel_Pz[i]) );
+    }
+    if (debug) cout << "Hard done" << endl;
 
-    /*
-    if (TBJets.size()==0) {
-      jetSelect.push_back(TJets[0]);
-      jetSelect.push_back(TJets[1]);
-    }
-    else if (TBJets.size()==1) {
-      if (TBJets[0].ijet() != TJets[0].ijet()) {
-	jetSelect.push_back(TJets[0]);
-	jetSelect.push_back(TBJets[0]);
-      }
-      else {
-	jetSelect.push_back(TJets[1]);
-	jetSelect.push_back(TBJets[0]);
-      }
-    }
-    else if (TBJets.size()>=2) {
-      jetSelect.push_back(TBJets[0]);
-      jetSelect.push_back(TBJets[1]);
-    }
-    */  
-    // GJet1.SetPxPyPzE(GJet_Px[0],GJet_Py[0],GJet_Pz[0],GJet_E[0]);
-    // TJet1.SetPxPyPzE(TJet_Px[0],TJet_Py[0],TJet_Pz[0],TJet_E[0]);
-    // if (TNJetsBtag != TBJets.size() ) cout <<"CAZZO"<< endl;
-    if ( TNJetSel>=2 && GNElec==2) {
+    
+    if ( TNJetSel>=2 && GLeptons.size()==2) {
       h2_jetERes_leading->Fill((jetSelect[0].lorentzVec().E()-GJets[0].lorentzVec().E()),jetSelect[0].lorentzVec().E());
       h2_jetPtRes_leading->Fill((jetSelect[0].lorentzVec().Pt()-GJets[0].lorentzVec().Pt()),jetSelect[0].lorentzVec().Pt());
 

@@ -20,24 +20,24 @@ void GenSelection::GenPartSelection(Int_t nGen, Int_t *Gen_pdgId, Int_t *Gen_sta
     if (Gen_pt[ipart] >= pt_cut_min && Gen_pt[ipart] < pt_cut_max
         && fabs(Gen_eta[ipart]) < eta_cut) { 
       vPart.SetPtEtaPhiM(Gen_pt[ipart], Gen_eta[ipart], Gen_phi[ipart], Gen_mass[ipart]);
-      if (fabs(Gen_pdgId[ipart])==11 && Gen_status[ipart]==1) {
+      if (fabs(Gen_pdgId[ipart])==11 && (fabs(Gen_motherId[ipart])==23 || fabs(Gen_motherId[ipart])==24 || fabs(Gen_motherId[ipart])==15) ) {
 	leptonType = Lepton::Electron;
 	//	electronColl.push_back(vPart);
 	electronColl.push_back( Lepton(leptonType, ipart, vPart, eta, btag, btag, btag, charge, fakeType, looseTight, btag) );
       }
-      if (fabs(Gen_pdgId[ipart])==12 && Gen_status[ipart]==1) {
+      if (fabs(Gen_pdgId[ipart])==12 && (fabs(Gen_motherId[ipart])==23 || fabs(Gen_motherId[ipart])==24 || fabs(Gen_motherId[ipart])==15)) {
 	leptonType = Lepton::Electron;
 	electronNuColl.push_back( Lepton(leptonType, ipart, vPart, eta, btag, btag, btag, charge, fakeType, looseTight, btag) );
       }    
-      if (fabs(Gen_pdgId[ipart])==13 && Gen_status[ipart]==1) {
+      if (fabs(Gen_pdgId[ipart])==13 && (fabs(Gen_motherId[ipart])==23 || fabs(Gen_motherId[ipart])==24 || fabs(Gen_motherId[ipart])==15)) {
 	leptonType = Lepton::Muon;
 	muonColl.push_back( Lepton(leptonType, ipart, vPart, eta, btag, btag, btag, charge, fakeType, looseTight, btag) );
       }
-      if (fabs(Gen_pdgId[ipart])==14 && Gen_status[ipart]==1) {
+      if (fabs(Gen_pdgId[ipart])==14 && (fabs(Gen_motherId[ipart])==23 || fabs(Gen_motherId[ipart])==24 || fabs(Gen_motherId[ipart])==15)) {
 	leptonType = Lepton::Muon;
 	muonNuColl.push_back( Lepton(leptonType, ipart, vPart, eta, btag, btag, btag, charge, fakeType, looseTight, btag) );
       }
-      if (fabs(Gen_pdgId[ipart])==5)
+      if (fabs(Gen_pdgId[ipart])==5 && fabs(Gen_motherId[ipart])==6)
 	bquarkColl.push_back( Jet(vPart, eta, btag, ipart));
       if ( (fabs(Gen_pdgId[ipart])>0 && fabs(Gen_pdgId[ipart])<5) || fabs(Gen_pdgId[ipart])==21)
 	lightquarkColl.push_back(vPart);

@@ -1,0 +1,9 @@
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_TTbar2L_Powheg_0.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_TTbar2L_Powheg_1.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_TTbar2L_Powheg_2.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_TTbar2L_Powheg_3.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_TTbar2L_Powheg_4.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_TTbar2L_Powheg_5.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_TTbar2L_Powheg_6.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_TTbar2L_Powheg_7.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_TTbar2L_Powheg_8.root

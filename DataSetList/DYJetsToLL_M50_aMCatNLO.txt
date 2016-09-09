@@ -1,4 +1,3 @@
-/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/DYJetsToLL_M50_aMCatNLO_7_4_12_patch4/DYJetsToLL_M50_aMCatNLO_0.root
-/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/DYJetsToLL_M50_aMCatNLO_7_4_12_patch4/DYJetsToLL_M50_aMCatNLO_1.root
-/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/DYJetsToLL_M50_aMCatNLO_7_4_12_patch4/DYJetsToLL_M50_aMCatNLO_2.root
-/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/DYJetsToLL_M50_aMCatNLO_7_4_12_patch4/DYJetsToLL_M50_aMCatNLO_3.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_DYJetsToLL_M50_aMCatNLO_0.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_DYJetsToLL_M50_aMCatNLO_1.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_DYJetsToLL_M50_aMCatNLO_2.root

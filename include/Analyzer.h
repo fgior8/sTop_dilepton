@@ -31,7 +31,7 @@ class Analyzer : public Data {
   const Bool_t debug = false;
   const Bool_t SaveTree = true;
   const Bool_t Blind = true;
-  const Double_t integratedlumi = 1260.;
+  const Double_t integratedlumi =  10219.1;
 //  static const Double_t integratedlumi = 1.0; //for Fakes
   const Double_t Mass_Z = 91.1876;
   const Double_t Mass_W = 80.398;
@@ -72,7 +72,7 @@ class Analyzer : public Data {
   
   UInt_t ncuts, nchannels, nsystematics;
   vector<Int_t> selectionStep; vector<Int_t> selectChannel; vector<Int_t> selectionStepZDY;
-  vector<Lepton> muonColl; vector<Lepton> electronColl;
+  vector<Lepton> muonColl; vector<Lepton> muonCollLoose; vector<Lepton> electronColl; vector<Lepton> electronCollLoose;
   vector<Lepton> genElec, genMuon, genNuElec, genNuMuon;
   vector<Jet> jetColl[14]; vector<Jet> bjetColl[14]; vector<Jet> jetHTColl[14];
   vector<Jet> jetSelect; vector<Jet> jetGenColl; vector<Jet> hardBquark;
@@ -103,7 +103,7 @@ class Analyzer : public Data {
   Analyzer();
   ~Analyzer();
   void Loop();
-  void SetWeight(TString name);
+  void SetWeight(TString name, Long64_t eventProcessed);
   void SetName(TString name, Int_t version);
   void SetEvtN(Long64_t events);
 

@@ -105,13 +105,13 @@ void Analyzer::SetName(TString name, Int_t version) {
   }
 }
 
-void Analyzer::SetWeight(TString name) {
+void Analyzer::SetWeight(TString name, Long64_t eventProcessed) {
   // lumi *  cs(pb) * gen filter efficiency / MCevents
-  MCweight = integratedlumi * getXS_D(name);
+  MCweight = integratedlumi * getXS_D(name, eventProcessed);
   name.Contains("Muon") || name.Contains("EG") ? isData=true : isData=false;
   name.Contains("MCatNLO") ? MCatNLO=true : MCatNLO=false;
   name.Contains("DoubleEG") ? isDoubleEl=true : isDoubleEl=false;
-  name.Contains("MuonEG") ? isMuEG=true : isMuEG=false;
+  name.Contains("MuEG") ? isMuEG=true : isMuEG=false;
   name.Contains("DoubleMuon") ? isDoubleMu=true : isDoubleMu=false;
   if(isData) MCweight = 1;
   cout<<"MCweight = "<<MCweight<<endl;
@@ -160,7 +160,9 @@ void Analyzer::Loop() {
     weight = MCweight;
  
     /// only for MC atNLO normalization ///
-    if (MCatNLO && !isData) weight *= genWeight;
+    if (MCatNLO && !isData)
+      weight *= genWeight;
+    //genWeight>0 ? weight *= 1. : weight *= -1.;
     
     // MET filters for now all OFF
     //----------------------------------------------------------------------------
@@ -172,25 +174,24 @@ void Analyzer::Loop() {
 
     Float_t valueMET[] = {met_pt, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     Float_t valueMETPhi[] = {met_phi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    
 
-    if (!isData) {
-      //weight *= puWeight;
-      /// ***PU reweghting*** ///
-      h_VertexNoReweight->Fill(numberVertices, weight);
-      weight *= reweightPU->GetWeight(nTrueInt);
-      h_VertexPostReweight->Fill(numberVertices, weight);
-    }
+    h_VertexNoReweight->Fill(numberVertices, weight);
+    /// ***PU reweghting*** ///
+    if (!isData)
+      //weight *= reweightPU->GetWeight(nTrueInt);
+      weight *= puWeight;
+    h_VertexPostReweight->Fill(numberVertices, weight);
+
 
     if(debug) cout<< "object selection" <<endl;
     
     //cleaning all collections at the beginning of each event///
-    muonColl.clear(); electronColl.clear();
-    genElec.clear(); genMuon.clear(); hardBquark.clear(); genLightquark.clear();
+    muonColl.clear(); muonCollLoose.clear(); electronColl.clear(); electronCollLoose.clear();
+    genElec.clear(); genNuElec.clear(); genMuon.clear(); genNuMuon.clear(); hardBquark.clear(); genLightquark.clear();
     jetGenColl.clear(); leptonGenColl.clear();
     ///cleaning vectors//
     for (UInt_t kk=0;kk<nsystematics+1;kk++) {//nsystematics
-      jetColl[kk].clear();    bjetColl[kk].clear(); jetHTColl[kk].clear();
+      jetColl[kk].clear(); bjetColl[kk].clear(); jetHTColl[kk].clear();
     }
     
     Muon.SetPt(15);
@@ -199,26 +200,30 @@ void Analyzer::Loop() {
     Muon.SetChiNdof(10);
     Muon.SetBSdxy(0.20);
     Muon.SetBSdz(0.50);
-    Muon.MuonSelection(nLepGood, LepGood_pdgId, LepGood_pfMuonId, LepGood_eta, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_trackerHits, LepGood_pixelLayers, LepGood_nStations, LepGood_trackerLayers, LepGood_globalTrackChi2, LepGood_dxy, LepGood_dz, muonColl);
+    Muon.MuonSelectionWithLoose(nLepGood, LepGood_pdgId, LepGood_pfMuonId, LepGood_isGlobalMuon, LepGood_isTrackerMuon, LepGood_eta, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_trackerHits, LepGood_pixelLayers, LepGood_nStations, LepGood_trackerLayers, LepGood_globalTrackChi2, LepGood_dxy, LepGood_dz, muonColl, muonCollLoose);
     
     Electron.SetPt(15);
     Electron.SetEta(2.5);
     Electron.SetRelIso(0.15);
     Electron.SetBSdxy(0.02);
     Electron.SetBSdz(0.10);
-    Electron.ElectronSelection(nLepGood, LepGood_pdgId, LepGood_etaSc, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_convVeto, LepGood_lostHits, LepGood_dEtaScTrkIn, LepGood_dPhiScTrkIn, LepGood_sigmaIEtaIEta, LepGood_hadronicOverEm, LepGood_eInvMinusPInv, LepGood_dxy, LepGood_dz, electronColl);
+    Electron.ElectronSelectionWithLoose(nLepGood, LepGood_pdgId, LepGood_etaSc, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_convVeto, LepGood_lostHits, LepGood_dEtaScTrkIn, LepGood_dPhiScTrkIn, LepGood_sigmaIEtaIEta, LepGood_hadronicOverEm, LepGood_eInvMinusPInv, LepGood_dxy, LepGood_dz, electronColl, electronCollLoose);
 
+    if ( (electronColl.size()+muonColl.size())>1 )
+      h_prova->Fill(10);
     // check MC matching ID
-    if (!isData && false) {
+    if (!isData) {
       for (UInt_t i=0;i<electronColl.size();i++) {
-	if (fabs(LepGood_mcMatchPdgId[electronColl[i].ilepton()]!=11))
+	if (fabs(LepGood_mcMatchId[electronColl[i].ilepton()]==0))
 	  electronColl.erase(electronColl.begin()+i);
       }
       for (UInt_t i=0;i<muonColl.size();i++) {
-	if (fabs(LepGood_mcMatchPdgId[muonColl[i].ilepton()]!=13))
+	if (fabs(LepGood_mcMatchId[muonColl[i].ilepton()]==0))
 	  muonColl.erase(muonColl.begin()+i);
       }
     }
+    if ( (electronColl.size()+muonColl.size())>1 )
+      h_prova->Fill(100);
 
     GenPart.GenPartSelection(nGenPart, GenPart_pdgId, GenPart_status, GenPart_motherId, GenPart_grandmotherId, GenPart_sourceId, GenPart_charge, GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, genElec, genNuElec, genMuon, genNuMuon, hardBquark, genLightquark);
     
@@ -226,16 +231,16 @@ void Analyzer::Loop() {
     Float_t tmp_sys[] = {0,0};
     Jets.SetPt(10);
     Jets.SetEta(5.0);
-    Jets.JetSelectionLeptonVeto_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCMVA, Jet_hadronFlavour, electronColl, muonColl, jetHTColl);
+    Jets.JetSelectionLeptonVeto_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_btagCMVA, Jet_hadronFlavour, electronColl, muonColl, jetHTColl);
     
     Jets.SetPt(30);
     Jets.SetEta(2.4);
     Jets.SetBdisc(0.605);
-    Jets.JetSelectionLeptonVeto_andB_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_phEF, Jet_neHEF, Jet_eEF, Jet_chHEF, Jet_chHMult, Jet_mult, Jet_btagCSV, Jet_hadronFlavour, electronColl, muonColl, jetColl, bjetColl);
+    Jets.JetSelectionLeptonVeto_andB_JU(nJet, tmp_sys, Jet_id, Jet_pt, Jet_eta, Jet_px, Jet_py, Jet_pz, Jet_energy, Jet_btagCSV, Jet_hadronFlavour, electronColl, muonColl, jetColl, bjetColl);
 
     bjetColl[0].clear();
     for(UInt_t i=0;i<jetColl[0].size();i++) {
-      if (!(fabs(Jet_mcFlavour[jetColl[0][i].ijet()])==5 && fabs(Jet_hadronFlavour[jetColl[0][i].ijet()])==5))
+      if (!isData && Jet_hadronFlavour[jetColl[0][i].ijet()]!=Jet_mcMatchFlav[jetColl[0][i].ijet()])
 	jetColl[0].erase(jetColl[0].begin()+i);
       if(isData) {
 	if( BTagSF->IsTagged(jetColl[0][i].btag_disc(), -999999, jetColl[0][i].lorentzVec().Pt(), jetColl[0][i].lorentzVec().Eta()) )
@@ -246,7 +251,9 @@ void Analyzer::Loop() {
 	  bjetColl[0].push_back(jetColl[0][i]);
       }
     }
-   
+    if ( jetColl[0].size()>1 )
+      h_prova->Fill(1000);
+    
     if(debug) cout<< "DONE object selection" <<endl;
     for (Variation sysvar=(Analyzer::Variation)0;sysvar<nsystematics+1;sysvar=(Analyzer::Variation)(sysvar+1)) {
       if (debug) cout << "Looking at sys n " << sysvar << endl;
@@ -292,7 +299,7 @@ void Analyzer::Loop() {
 
       //Making leptons and jets selected collections
       // it seems more convinent to take only two leptons, once the triggers are set we need to add the here FIXME 
-      if (muonColl.size()==2 && electronColl.size()==0 && (!isData || isDoubleMu) ) {//&& HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v>0 ) {
+      if (muonCollLoose.size()==2 && muonColl.size()==2 && electronCollLoose.size()==0 && (!isData || (isDoubleMu && HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v>0) ) ) {
 	invMtemp=0;
 	if (muonColl[0].charge()*muonColl[1].charge()<0 && muonColl[0].lorentzVec().Pt()>20) 
 	  invMtemp = (muonColl[0].lorentzVec()+muonColl[1].lorentzVec()).M();
@@ -304,7 +311,7 @@ void Analyzer::Loop() {
 	  selectChannel.push_back(3);
 	}
       }
-      if (electronColl.size()==2 && muonColl.size()==0 && (!isData || isDoubleEl) ) { //&& HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v>0 ) {
+      if (electronCollLoose.size()==2 && electronColl.size()==2 && muonCollLoose.size()==0 && (!isData || (isDoubleEl && HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v>0) ) ) {
 	invMtemp=0;
 	if (electronColl[0].charge()*electronColl[1].charge()<0 && electronColl[0].lorentzVec().Pt()>20) 
 	  invMtemp = (electronColl[0].lorentzVec()+electronColl[1].lorentzVec()).M();
@@ -317,7 +324,7 @@ void Analyzer::Loop() {
 	  selectChannel.push_back(2);
 	}
       }
-      if (muonColl.size()==1 && electronColl.size()==1 && (!isData || isMuEG) ) { //&& (HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v>0 || HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v) ) {
+      if (muonCollLoose.size()==1 && muonColl.size()==1 && electronCollLoose.size()==1 && electronColl.size()==1 && (!isData || (isMuEG && (HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v>0 || HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v) ) ) ) {
 	invMtemp=0;
 	if (muonColl[0].charge()*electronColl[0].charge()<0 && (electronColl[0].lorentzVec().Pt()>20 || muonColl[0].lorentzVec().Pt()>20)) 
 	  invMtemp = (muonColl[0].lorentzVec()+electronColl[0].lorentzVec()).M();
@@ -333,7 +340,7 @@ void Analyzer::Loop() {
       if(debug) cout<< "two leptons found" <<endl;
 
       // applying scaling factor for ID and triggers (now that we have selected the event type)
-      if (!isData && sysvar==CentralValue && true) {
+      if (!isData && sysvar==CentralValue && false) {
 	//trigger SF only for emu but applied to both FIXME
 	weight *= hmueTriggerSF->GetBinContent( hmueTriggerSF->FindBin( fabs(leptonSelect[0].lorentzVec().Eta()),fabs(leptonSelect[1].lorentzVec().Eta()) ) );
       
@@ -416,7 +423,6 @@ void Analyzer::Loop() {
       /// filled the tree
       if (debug) cout << "-- tree filled --" << endl;
 
-
       if (Blind && (vetoMT2ll>80 || vetoMT2bb>180 || vetoMT2lblb>180)) continue;
       
       met_cut = 40;
@@ -455,7 +461,6 @@ void Analyzer::Loop() {
 	  channel = selectChannel[n];
 	  for (UInt_t m=0;m<selectionStep.size();m++) {
 	    cut = selectionStep[m];
-	    
 	    h_signal[cut][channel]->Fill(numberVertices, valueMET[sysvar], valueMETPhi[sysvar], leptonSelect, jetSelect, weight, channel, cut);
 	    for (Int_t i=0; i<muonColl.size(); i++) {
 	      index=muonColl[i].ilepton();

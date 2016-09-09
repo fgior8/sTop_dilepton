@@ -1,38 +1,42 @@
 #include "XSlist.h"
 
-float getXS_D(TString MCsample) {
+float getXS_D(TString MCsample, Long64_t &eventProcessed) {
   float eventXS=-1.;
   
-  if (MCsample.Contains("TTJets")) 
-    eventXS=831.8/89704515;
+  if (MCsample.Contains("TTJets_MLM")) 
+    eventXS=831.8/eventProcessed;//10259872;
   if (MCsample.Contains("TTbar_Powheg"))
-    eventXS=831.8/96834559.;
+    eventXS=831.8/eventProcessed;//92925926.;
+  if (MCsample.Contains("TTbar2L_Powheg"))
+    eventXS=88.3/eventProcessed;//104607105.;
   if (MCsample.Contains("TTLep_pow")) 
-    eventXS=87.3/4997000;
+    eventXS=87.3/eventProcessed;//4997000;
   if (MCsample.Contains("TbarW")) 
-    eventXS=35.6/995600;
+    eventXS=35.6/eventProcessed;//985000;
   if (MCsample.Contains("TW")) 
-    eventXS=35.6/995600;
-  if (MCsample.Contains("DYJetsToLL_M10to50")) 
-    eventXS=22635.1/29678847;
-  if (MCsample.Contains("DYJetsToLL_M50")) 
-    eventXS=6025.2/28747969;
-  if (MCsample.Contains("WJetsToLNu")) 
-    eventXS=61526.7/22394671;
+    eventXS=35.6/eventProcessed;//998400;
+  if (MCsample.Contains("DYJetsToLL_M10to50_aMCatNLO")) 
+    eventXS=22635.1/eventProcessed;//30915886;
+  if (MCsample.Contains("DYJetsToLL_M50_aMCatNLO")) 
+    eventXS=6025.2/eventProcessed;//28696958;
+  if (MCsample.Contains("DYJetsToLL_M50_MLM"))
+    eventXS=6025.2/eventProcessed;//49877138;
+  if (MCsample.Contains("WJetsToLNu_aMCatNLO")) 
+    eventXS=61526.7/eventProcessed;//9908534;
   if (MCsample.Contains("TTWToLNu")) 
-    eventXS=0.204/252908;
+    eventXS=0.204/eventProcessed;//252673;
   if (MCsample.Contains("TTWToQQ")) 
-    eventXS=0.406/833964;
+    eventXS=0.406/eventProcessed;//833298;
   if (MCsample.Contains("TTZToLLNuNu")) //to be checked
-    eventXS=0.2529/398000.;
+    eventXS=0.2529/eventProcessed;//398600.;
   if (MCsample.Contains("TTZToQQ")) 
-    eventXS=0.5297/749800;
+    eventXS=0.5297/eventProcessed;//749400;
   if (MCsample.Contains("WW")) 
-    eventXS=115.0/993640; 
+    eventXS=115.0/eventProcessed;//993214; 
   if (MCsample.Contains("WZ")) 
-    eventXS=47.1/978512;
+    eventXS=47.1/eventProcessed;//1000000;
   if (MCsample.Contains("ZZ")) 
-    eventXS=16.5/996944;
+    eventXS=16.5/eventProcessed;//989312;
   if (MCsample.Contains("T2tt_850_100")) 
     eventXS=0.019/240685.;
   if (MCsample.Contains("T2tt_650LSP325")) 

@@ -7,7 +7,7 @@ using namespace std;
 
 float getXS(TString MCsample);
 
-float getXS_D(TString MCsample);
+float getXS_D(TString MCsample, Long64_t &eventProcessed);
 
 float getXSFIVE(TString MCsample);
 

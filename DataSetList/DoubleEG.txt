@@ -1,0 +1,2 @@
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_DoubleEG_Run2016B_PromptReco_v2_0.root
+/gpfs/csic_projects/cms/palencia/heppyTrees/HeppyTreesDR80X/v1/Tree_DoubleEG_Run2016D_PromptReco_v2_0.root

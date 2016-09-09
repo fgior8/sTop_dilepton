@@ -76,46 +76,105 @@ void ElectronSel::ElectronSelection(Int_t nElectron, Int_t *pdgId, Float_t *EtaS
   
 }
 
-void ElectronSel::ElectronSelectionLoose(Int_t nElectron, std::vector<Int_t> isID, std::vector<Bool_t> isEB, std::vector<Bool_t> isEE, std::vector<Bool_t> TrackerDrivenSeed, std::vector<Bool_t> EcalDrivenSeed, std::vector<Double_t> Eta, std::vector<Double_t> Phi, std::vector<Double_t> Pt, std::vector<Double_t> E, std::vector<Double_t> TrkIso, std::vector<Double_t> ECalIso, std::vector<Double_t> HCalIso, std::vector<Int_t> Charge, std::vector<Bool_t> ChargeConsistency, std::vector<Int_t> MissingHits, std::vector<Bool_t> HasMatchedConvPhot, std::vector<Double_t> DeltaEtaTrkSC, std::vector<Double_t> DeltaPhiTrkSC, std::vector<Double_t> SigmaIEtaIEta, std::vector<Double_t> HoE, std::vector<Double_t> caloEnergy, std::vector<Double_t> SuperClusterOverP, std::vector<Double_t> Trkdx, std::vector<Double_t> Trkdy, std::vector<Double_t> Trkdz, Double_t Vertex_X, Double_t Vertex_Y, Double_t Vertex_Z, Double_t rho, std::vector<Lepton>& leptonColl) {
-  /*
+void ElectronSel::ElectronSelectionWithLoose(Int_t nElectron, Int_t *pdgId, Float_t *EtaSc, Float_t *Pt, Float_t *Px, Float_t *Py, Float_t *Pz, Float_t *E, Float_t *relIso, Int_t *Charge, Int_t *passConversionVeto, Int_t *MissingHits, Float_t *DeltaEtaTrkSC, Float_t *DeltaPhiTrkSC, Float_t *SigmaIEtaIEta, Float_t *HoE, Float_t *eInvMinusPInv, Float_t *dxy_var, Float_t *dz_var, std::vector<Lepton>& leptonColl, std::vector<Lepton>& leptonCollLoose) {
+
   D0=D0Error=0.;
+   
+  for (UInt_t ilep=0; ilep<sizeof(Pt); ilep++) {
+    if (fabs(pdgId[ilep])!=11) continue;
+    if ( fabs(EtaSc[ilep])>1.4442 && fabs(EtaSc[ilep])<1.566 ) continue;
+    fabs(EtaSc[ilep])<=1.4442 ? isEB=true : isEB=false;
+    fabs(EtaSc[ilep])>=1.566 ? isEE=true : isEE=false;  
+    if (!(isEB || isEE)) continue;
 
-  for (UInt_t ilep=0; ilep<Pt.size(); ilep++) {
+    vLepton.SetPxPyPzE(Px[ilep], Py[ilep], Pz[ilep], E[ilep]);
 
-    isID[ilep] ? ElectronID=true : ElectronID=false;
-
-    vLepton.SetPtEtaPhiE(Pt[ilep], Eta[ilep], Phi[ilep], E[ilep]);
-
+    dz = dz_var[ilep];
+    dxy = dxy_var[ilep];
+    
     fakeType = Lepton::unknown;
     looseTight = Lepton::Other;
     leptonType = Lepton::Electron;
 
-    if (fabs(Eta[ilep]) < 1.0) ifid = 0;
-    else if (fabs(Eta[ilep]) < 1.479) ifid = 1;
-    else if (fabs(Eta[ilep]) < 2.0) ifid = 2;
-    else if (fabs(Eta[ilep]) < 2.2) ifid = 3;
-    else if (fabs(Eta[ilep]) < 2.3) ifid = 4;
-    else if (fabs(Eta[ilep]) < 2.4) ifid = 5;
-    else ifid = 6;
-
-    if (Pt[ilep] > 0.01)
-      LeptonRelIso = ( HCalIso[ilep] + max( ECalIso[ilep] + TrkIso[ilep] - rho * PHONH[ifid], 0.) ) / Pt[ilep];
-    else LeptonRelIso = 9999.;
-
-    dz = fabs(Trkdz[ilep] - Vertex_Z);
-    dxy = sqrt(pow(Trkdx[ilep]-Vertex_X,2)+pow(Trkdy[ilep]-Vertex_Y,2));
-
-    (fabs(Eta[ilep]) < eta_cut && Pt[ilep] >= pt_cut_min && Pt[ilep] < pt_cut_max) ? etaPt=true : etaPt =false;
-
-    (dz<dz_cut && dxy<dxy_cut && LeptonRelIso < relIso_cut && LeptonRelIso >= relIsoMIN_cut) ? RelIsod0=true : RelIsod0=false;
-
-    if (ElectronID && etaPt && RelIsod0 ) {
-      leptonColl.push_back( Lepton(leptonType, ilep, vLepton, Eta[ilep], LeptonchiNdof, D0, D0Error, dxy, dz, Charge[ilep], fakeType, looseTight, TrkIso[ilep], LeptonRelIso) );
+    LeptonRelIso = relIso[ilep];
+    
+    //// electron ID tight WP /// 
+    
+    ElectronID = ElectronIDLoose = false;
+    if (isEB) {
+      if (fabs(DeltaEtaTrkSC[ilep]) < 0.0126 &&
+	  fabs(DeltaPhiTrkSC[ilep]) < 0.107 &&
+	  SigmaIEtaIEta[ilep] < 0.012 &&
+	  HoE[ilep] < 0.186 &&
+	  MissingHits[ilep] <= 2 &&
+	  fabs(eInvMinusPInv[ilep]) < 0.239 &&
+	  passConversionVeto[ilep] > 0 &&
+	  LeptonRelIso < 0.161 &&
+	  fabs(dxy) < 0.0621 &&
+	  fabs(dz) < 0.613)
+	ElectronIDLoose = true;
+    }
+    else if (isEE) {
+      if (fabs(DeltaEtaTrkSC[ilep]) < 0.0109 &&
+	  fabs(DeltaPhiTrkSC[ilep]) < 0.219 &&
+	  SigmaIEtaIEta[ilep] < 0.0339 &&
+	  HoE[ilep] < 0.0962 &&
+	  MissingHits[ilep] <= 3 &&
+	  fabs(eInvMinusPInv[ilep]) < 0.141 &&
+	  passConversionVeto[ilep] > 0 &&
+	  LeptonRelIso < 0.193 &&
+	  dxy < 0.279 &&
+	  dz < 0.947)
+	ElectronIDLoose = true;
+    }
+    else
+      cout<< "something wrong with electron ID Loose" <<endl;
+    
+    if (isEB) {
+      if (fabs(DeltaEtaTrkSC[ilep]) < 0.0094 &&
+	  fabs(DeltaPhiTrkSC[ilep]) < 0.0296 &&
+	  SigmaIEtaIEta[ilep] < 0.0101 &&
+	  HoE[ilep] < 0.0372 &&
+	  MissingHits[ilep] <= 2 &&
+	  fabs(eInvMinusPInv[ilep]) < 0.118 &&
+	  passConversionVeto[ilep] > 0 &&
+	  LeptonRelIso < 0.0987 &&
+	  fabs(dxy) < 0.0151 &&
+	  fabs(dz) < 0.238)
+	ElectronID = true;
+    }
+    else if (isEE) {
+      if (fabs(DeltaEtaTrkSC[ilep]) < 0.00773 &&
+	  fabs(DeltaPhiTrkSC[ilep]) < 0.148 &&
+	  SigmaIEtaIEta[ilep] < 0.0287 &&
+	  HoE[ilep] < 0.0546 &&
+	  MissingHits[ilep] <= 1 &&
+	  fabs(eInvMinusPInv[ilep]) < 0.104 &&
+	  passConversionVeto[ilep] > 0 &&
+	  LeptonRelIso < 0.0902 &&
+	  dxy < 0.0535 &&
+	  dz < 0.572)
+	ElectronID = true;
+    }
+    else
+      cout<< "something wrong with electron ID" <<endl;
+ 
+    //  (ChargeConsistency[ilep]) ? individual = true : individual = false;
+ 
+    (fabs(vLepton.Eta()) < eta_cut && Pt[ilep] >= pt_cut_min && Pt[ilep] < pt_cut_max) ? etaPt=true : etaPt =false;
+    
+    // (dz<dz_cut && dxy<dxy_cut && LeptonRelIso < relIso_cut && LeptonRelIso >= relIsoMIN_cut) ? RelIsod0=true : RelIsod0=false;
+    
+    if (ElectronID && etaPt) {
+      leptonColl.push_back( Lepton(leptonType, ilep, vLepton, EtaSc[ilep], LeptonchiNdof, dxy, dz, Charge[ilep], fakeType, looseTight, LeptonRelIso) );
     }
 
+    if (ElectronIDLoose && etaPt) {
+      leptonCollLoose.push_back( Lepton(leptonType, ilep, vLepton, EtaSc[ilep], LeptonchiNdof, dxy, dz, Charge[ilep], fakeType, looseTight, LeptonRelIso) );
+    }
+    
   }
-
+  
   std::sort( leptonColl.begin(), leptonColl.end(), LeptonPTSorter );
-  */
+  
 }
-
