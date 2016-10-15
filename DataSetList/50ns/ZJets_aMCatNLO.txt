@@ -1,5 +1,0 @@
-/gpfs/csic_projects/tier3data/TreesDR74X/50ns//Tree_ZJets_aMCatNLO_2.root
-/gpfs/csic_projects/tier3data/TreesDR74X/50ns//Tree_ZJets_aMCatNLO_3.root
-/gpfs/csic_projects/tier3data/TreesDR74X/50ns//Tree_ZJets_aMCatNLO_1.root
-/gpfs/csic_projects/tier3data/TreesDR74X/50ns//Tree_ZJets_aMCatNLO_0.root
-/gpfs/csic_projects/tier3data/TreesDR74X/50ns//Tree_ZJets_aMCatNLO_4.root

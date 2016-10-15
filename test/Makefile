@@ -34,7 +34,7 @@ resulution : resolution
 
 
 analyzer: $(SRCDIR)runAnalyzer.cc 
-	$(CXX) $(CXXFLAGS) -I $(INCLUDEDIR) $(SRCDIR)mt2bisect.cc $(SRCDIR)Data.cc $(SRCDIR)ChainEntries.cc $(SRCDIR)ChainMaker.cc $(SRCDIR)XSlist.cc $(SRCDIR)Reweight.cc $(SRCDIR)OtherFunctions.cc $(SRCDIR)SignalPlots.cc $(SRCDIR)BTagSFUtil.C $(SRCDIR)StdPlots.cc $(SRCDIR)JetPlots.cc $(SRCDIR)ElectronPlots.cc $(SRCDIR)MuonPlots.cc $(SRCDIR)ZDYPlots.cc $(SRCDIR)SelectionFunctions.cc $(SRCDIR)LeptonSelection.cc $(SRCDIR)ElectronSelection.cc $(SRCDIR)MuonSelection.cc $(SRCDIR)JetSelection.cc $(SRCDIR)GenParticleSelection.cc $(SRCDIR)FillTandG.cc $(SRCDIR)Analyzer.cc $(SRCDIR)runAnalyzer.cc \
+	$(CXX) $(CXXFLAGS) -I $(INCLUDEDIR) $(SRCDIR)mt2bisect.cc $(SRCDIR)Data.cc $(SRCDIR)ChainMaker.cc $(SRCDIR)XSlist.cc $(SRCDIR)Reweight.cc $(SRCDIR)OtherFunctions.cc $(SRCDIR)SignalPlots.cc $(SRCDIR)BTagSFUtil.C $(SRCDIR)StdPlots.cc $(SRCDIR)JetPlots.cc $(SRCDIR)ElectronPlots.cc $(SRCDIR)MuonPlots.cc $(SRCDIR)ZDYPlots.cc $(SRCDIR)SelectionFunctions.cc $(SRCDIR)LeptonSelection.cc $(SRCDIR)ElectronSelection.cc $(SRCDIR)MuonSelection.cc $(SRCDIR)JetSelection.cc $(SRCDIR)GenParticleSelection.cc $(SRCDIR)FillTandG.cc $(SRCDIR)Analyzer.cc $(SRCDIR)runAnalyzer.cc \
 	$(ROOTCFLAGS) \
 	$(ROOTLIBS) \
 	$(FFTWIND) $(FFTWLIB) \

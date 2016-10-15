@@ -31,7 +31,9 @@ class Analyzer : public Data {
   const Bool_t debug = false;
   const Bool_t SaveTree = true;
   const Bool_t Blind = true;
-  const Double_t integratedlumi =  10219.1;
+  const Double_t integratedlumi = 12888.609;
+  const Double_t MuTriggersLumi = 12888.609;
+  const Double_t ElTriggersLumi = 11394.929;
 //  static const Double_t integratedlumi = 1.0; //for Fakes
   const Double_t Mass_Z = 91.1876;
   const Double_t Mass_W = 80.398;
@@ -39,10 +41,11 @@ class Analyzer : public Data {
 
   //SF parametrization
   TFile *MuSF_trig, *ElSF_trig, *MuElSF_trig;
-  TFile *MuSF_IDISO, *ElSF_IDISO;
-  TH2F *hmuIDSF, *hmumuTriggerSF;
-  TH2F *heIDSF, *heeTriggerSF;
+  TFile *MuSF_ID, *MuSF_ISO, *ElSF_IDISO;
+  TH2F *hmuIDSF, *hmuISOSF, *hmumuTriggerSF8, *hmumuTriggerSF17;
+  TH2F *heIDSF, *heeTriggerSF12, *heeTriggerSF23;
   TH2F *hmueTriggerSF;
+  Float_t ptSFlimit;
   //SF
 
   Bool_t isData, MCatNLO;

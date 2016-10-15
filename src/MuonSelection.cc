@@ -63,7 +63,7 @@ void MuonSel::MuonSelectionWithLoose(Int_t nMuon, Int_t *pdgId, Int_t *IsPF, Int
  
     if (etaPt && RelIsod0Chi2 && individual) 
       leptonColl.push_back( Lepton(leptonType, ilep, vLepton, Eta[ilep], LeptonchiNdof, dxy, dz, Charge[ilep], fakeType, looseTight, LeptonRelIso) );
-    if (etaPt && LeptonRelIso < 0.6)
+    if (fabs(Eta[ilep]) < 2.5 && Pt[ilep] >=10 &&  LeptonRelIso < 0.6)
       leptonCollLoose.push_back( Lepton(leptonType, ilep, vLepton, Eta[ilep], LeptonchiNdof, dxy, dz, Charge[ilep], fakeType, looseTight, LeptonRelIso) );
    
   }

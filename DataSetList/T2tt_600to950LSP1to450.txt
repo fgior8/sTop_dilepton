@@ -1,2 +1,0 @@
-/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/T2tt_600to950LSP1to450_7_4_12_patch4/T2tt_600to950LSP1to450_0.root
-/gpfs/csic_projects/cms/fgior8/InputTrees_stop_01june2016/T2tt_600to950LSP1to450_7_4_12_patch4/T2tt_600to950LSP1to450_1.root

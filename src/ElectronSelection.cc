@@ -30,31 +30,30 @@ void ElectronSel::ElectronSelection(Int_t nElectron, Int_t *pdgId, Float_t *EtaS
     
     //// electron ID tight WP /// 
     
-    ElectronID = false;
     if (isEB) {
-      if (fabs(DeltaEtaTrkSC[ilep]) < 0.00926 &&
-	  fabs(DeltaPhiTrkSC[ilep]) < 0.0336 &&
-	  SigmaIEtaIEta[ilep] < 0.0101 &&
-	  HoE[ilep] < 0.0597 &&
-	  MissingHits[ilep] <= 2 &&
-	  fabs(eInvMinusPInv[ilep]) < 0.012 &&
+      if (fabs(DeltaEtaTrkSC[ilep]) < 0.00308 &&
+	  fabs(DeltaPhiTrkSC[ilep]) < 0.0816 &&
+	  SigmaIEtaIEta[ilep] < 0.00998 &&
+	  HoE[ilep] < 0.0414 &&
+	  MissingHits[ilep] <= 1 &&
+	  fabs(eInvMinusPInv[ilep]) < 0.0129 &&
 	  passConversionVeto[ilep] > 0 &&
-	  LeptonRelIso < 0.0354 &&
-	  fabs(dxy) < 0.0111 &&
-	  fabs(dz) < 0.0466)
+	  LeptonRelIso < 0.0588 &&
+	  fabs(dxy) < 0.05 &&
+	  fabs(dz) < 0.10)
 	ElectronID = true;
     }
     else if (isEE) {
-      if (fabs(DeltaEtaTrkSC[ilep]) < 0.00724 &&
-	  fabs(DeltaPhiTrkSC[ilep]) < 0.0918 &&
-	  SigmaIEtaIEta[ilep] < 0.0279 &&
-	  HoE[ilep] < 0.0615 &&
+      if (fabs(DeltaEtaTrkSC[ilep]) < 0.00605 &&
+	  fabs(DeltaPhiTrkSC[ilep]) < 0.0394 &&
+	  SigmaIEtaIEta[ilep] < 0.0292 &&
+	  HoE[ilep] < 0.0641 &&
 	  MissingHits[ilep] <= 1 &&
-	  fabs(eInvMinusPInv[ilep]) < 0.00999 &&
+	  fabs(eInvMinusPInv[ilep]) < 0.0129 &&
 	  passConversionVeto[ilep] > 0 &&
-	  LeptonRelIso < 0.0646 &&
-	  dxy < 0.0351 &&
-	  dz < 0.417)
+	  LeptonRelIso < 0.0571 &&
+	  dxy < 0.10 &&
+	  dz < 0.20)
 	ElectronID = true;
     }
     else
@@ -102,58 +101,58 @@ void ElectronSel::ElectronSelectionWithLoose(Int_t nElectron, Int_t *pdgId, Floa
     
     ElectronID = ElectronIDLoose = false;
     if (isEB) {
-      if (fabs(DeltaEtaTrkSC[ilep]) < 0.0126 &&
-	  fabs(DeltaPhiTrkSC[ilep]) < 0.107 &&
-	  SigmaIEtaIEta[ilep] < 0.012 &&
-	  HoE[ilep] < 0.186 &&
+      if (fabs(DeltaEtaTrkSC[ilep]) < 0.00749 &&
+	  fabs(DeltaPhiTrkSC[ilep]) < 0.228 &&
+	  SigmaIEtaIEta[ilep] < 0.0115 &&
+	  HoE[ilep] < 0.356 &&
 	  MissingHits[ilep] <= 2 &&
-	  fabs(eInvMinusPInv[ilep]) < 0.239 &&
+	  fabs(eInvMinusPInv[ilep]) < 0.299 &&
 	  passConversionVeto[ilep] > 0 &&
-	  LeptonRelIso < 0.161 &&
-	  fabs(dxy) < 0.0621 &&
-	  fabs(dz) < 0.613)
+	  LeptonRelIso < 0.175 &&
+	  fabs(dxy) < 0.20 &&
+	  fabs(dz) < 0.50)
 	ElectronIDLoose = true;
     }
     else if (isEE) {
-      if (fabs(DeltaEtaTrkSC[ilep]) < 0.0109 &&
-	  fabs(DeltaPhiTrkSC[ilep]) < 0.219 &&
-	  SigmaIEtaIEta[ilep] < 0.0339 &&
-	  HoE[ilep] < 0.0962 &&
+      if (fabs(DeltaEtaTrkSC[ilep]) < 0.00895 &&
+	  fabs(DeltaPhiTrkSC[ilep]) < 0.213 &&
+	  SigmaIEtaIEta[ilep] < 0.037 &&
+	  HoE[ilep] < 0.211 &&
 	  MissingHits[ilep] <= 3 &&
-	  fabs(eInvMinusPInv[ilep]) < 0.141 &&
+	  fabs(eInvMinusPInv[ilep]) < 0.15 &&
 	  passConversionVeto[ilep] > 0 &&
-	  LeptonRelIso < 0.193 &&
-	  dxy < 0.279 &&
-	  dz < 0.947)
+	  LeptonRelIso < 0.159 &&
+	  dxy < 0.20 &&
+	  dz < 0.50)
 	ElectronIDLoose = true;
     }
     else
       cout<< "something wrong with electron ID Loose" <<endl;
     
     if (isEB) {
-      if (fabs(DeltaEtaTrkSC[ilep]) < 0.0094 &&
-	  fabs(DeltaPhiTrkSC[ilep]) < 0.0296 &&
-	  SigmaIEtaIEta[ilep] < 0.0101 &&
-	  HoE[ilep] < 0.0372 &&
-	  MissingHits[ilep] <= 2 &&
-	  fabs(eInvMinusPInv[ilep]) < 0.118 &&
+      if (fabs(DeltaEtaTrkSC[ilep]) < 0.00308 &&
+	  fabs(DeltaPhiTrkSC[ilep]) < 0.0816 &&
+	  SigmaIEtaIEta[ilep] < 0.00998 &&
+	  HoE[ilep] < 0.0414 &&
+	  MissingHits[ilep] <= 1 &&
+	  fabs(eInvMinusPInv[ilep]) < 0.0129 &&
 	  passConversionVeto[ilep] > 0 &&
-	  LeptonRelIso < 0.0987 &&
-	  fabs(dxy) < 0.0151 &&
-	  fabs(dz) < 0.238)
+	  LeptonRelIso < 0.0588 &&
+	  fabs(dxy) < 0.05 &&
+	  fabs(dz) < 0.10)
 	ElectronID = true;
     }
     else if (isEE) {
-      if (fabs(DeltaEtaTrkSC[ilep]) < 0.00773 &&
-	  fabs(DeltaPhiTrkSC[ilep]) < 0.148 &&
-	  SigmaIEtaIEta[ilep] < 0.0287 &&
-	  HoE[ilep] < 0.0546 &&
+      if (fabs(DeltaEtaTrkSC[ilep]) < 0.00605 &&
+	  fabs(DeltaPhiTrkSC[ilep]) < 0.0394 &&
+	  SigmaIEtaIEta[ilep] < 0.0292 &&
+	  HoE[ilep] < 0.0641 &&
 	  MissingHits[ilep] <= 1 &&
-	  fabs(eInvMinusPInv[ilep]) < 0.104 &&
+	  fabs(eInvMinusPInv[ilep]) < 0.0129 &&
 	  passConversionVeto[ilep] > 0 &&
-	  LeptonRelIso < 0.0902 &&
-	  dxy < 0.0535 &&
-	  dz < 0.572)
+	  LeptonRelIso < 0.0571 &&
+	  dxy < 0.10 &&
+	  dz < 0.20)
 	ElectronID = true;
     }
     else
@@ -169,7 +168,7 @@ void ElectronSel::ElectronSelectionWithLoose(Int_t nElectron, Int_t *pdgId, Floa
       leptonColl.push_back( Lepton(leptonType, ilep, vLepton, EtaSc[ilep], LeptonchiNdof, dxy, dz, Charge[ilep], fakeType, looseTight, LeptonRelIso) );
     }
 
-    if (ElectronIDLoose && etaPt) {
+    if (ElectronIDLoose && fabs(vLepton.Eta()) < 2.5 && Pt[ilep] >= 10) {
       leptonCollLoose.push_back( Lepton(leptonType, ilep, vLepton, EtaSc[ilep], LeptonchiNdof, dxy, dz, Charge[ilep], fakeType, looseTight, LeptonRelIso) );
     }
     

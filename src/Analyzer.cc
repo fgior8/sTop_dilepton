@@ -6,29 +6,39 @@ Analyzer::Analyzer() {
   if (debug) cout<<"inizio"<<endl;
 
   // PILEUP //
-  reweightPU = new ReweightPU("/gpfs/csic_projects/cms/fgior8/PileUpDistr/MyDataPileupHistogram.root");
-  if (debug) cout<< "PU histos loaded" <<endl;
+  reweightPU = new ReweightPU("/gpfs/csic_projects/cms/fgior8/PileUpDistr/EnDataPileupHistogram.root");
+  //if (debug) cout<< "PU histos loaded" <<endl;
 
   // Scale Factors ///
   // --first for the trigger-- //
-  //  MuSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_mumu_ttbar.root"); //only EMu for the moment //FIXME
-  //  ElSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_ee_ttbar.root");
+  MuSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/HLT_Efficiencies_4fb_2016.root"); //only EMu for the moment //FIXME
+  ElSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/HLT_Efficiencies_4fb_2016.root");
   MuElSF_trig = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_emu_13TeV_RunD.root");
   if(!MuElSF_trig)
     cout << "ERROR [MuonSF_trig]: Could not open file " << MuSF_trig << " or " << ElSF_trig << " or " << MuElSF_trig << "!"  << endl;
   // --second for the ID and Isolation-- //
-  MuSF_IDISO   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/MuonSF_IDISO_Trigger_POG25ns.root");
-  ElSF_IDISO   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/elec_tight_sf2D_13TeV_RunD.root");
-  if(!MuSF_IDISO || !ElSF_IDISO)
-    cout << "ERROR [MuonSF_IDISO]: Could not open file " << MuSF_IDISO << " or " << ElSF_IDISO << "!"  << endl;
-
-  hmuIDSF        = (TH2F*) MuSF_IDISO->Get("GlobalSF")->Clone("muIDSF");
-  //hmumuTriggerSF = (TH2F*) MuSF_trig ->Get("scalefactor_eta2d_with_syst")  ->Clone("mumuTriggerSF"); 
-  if(!hmuIDSF)// || !hmumuTriggerSF)
+  MuSF_ID      = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/MuonID_Z_RunBCD_prompt80X_7p65.root");
+  MuSF_ISO     = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/MuonIso_Z_RunBCD_prompt80X_7p65.root");
+  ElSF_IDISO   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/egammaEffi_tight_SF2D.root");
+  if(!MuSF_ISO || !MuSF_ID || !ElSF_IDISO)
+    cout << "ERROR [MuonSF_IDISO]: Could not open file " << MuSF_ID << " or " << MuSF_ISO << " or " << ElSF_IDISO << "!"  << endl;
+  if (debug) cout<< "all files loaded" <<endl;
+  
+  MuSF_ID->cd("MC_NUM_TightIDandIPCut_DEN_genTracks_PAR_pt_spliteta_bin1");
+  TDirectory *dirID = gDirectory;
+  hmuIDSF = (TH2F*) dirID->Get("abseta_pt_ratio")->Clone("muIDSF");
+  MuSF_ISO->cd("MC_NUM_TightRelIso_DEN_TightID_PAR_pt_spliteta_bin1");
+  TDirectory *dirISO = gDirectory;
+  hmuISOSF         = (TH2F*) dirISO->Get("abseta_pt_ratio")->Clone("muISOSF");
+  hmumuTriggerSF8  = (TH2F*) MuSF_trig->Get("hist2dnum_Mu8__HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL")->Clone("mumuTriggerSF8");
+  hmumuTriggerSF17 = (TH2F*) MuSF_trig->Get("hist2dnum_Mu17__HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL")->Clone("mumuTriggerSF17");
+  if(!hmuIDSF || !hmuISOSF || !hmumuTriggerSF8 || !hmumuTriggerSF17)
     cout << "ERROR [MuonSF]: Could not find histogram for SF reweighting" << endl;
-  heIDSF       = (TH2F*) ElSF_IDISO->Get("GlobalSF")->Clone("eIDSF");
-  //heeTriggerSF = (TH2F*) ElSF_trig ->Get("scalefactor_eta2d_with_syst")  ->Clone("eeTriggerSF");
-  if(!heIDSF)// || !heeTriggerSF)
+  
+  heIDSF         = (TH2F*) ElSF_IDISO->Get("EGamma_SF2D")->Clone("eIDSF");
+  heeTriggerSF12 = (TH2F*) ElSF_trig ->Get("hist2dnum_Ele12_CaloIdL_TrackIdL_IsoVL__HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL")->Clone("eeTriggerSF12");
+  heeTriggerSF23 = (TH2F*) ElSF_trig ->Get("hist2dnum_Ele23_CaloIdL_TrackIdL_IsoVL__HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL")->Clone("eeTriggerSF23");
+  if(!heIDSF || !heeTriggerSF12 || !heeTriggerSF23)
     cout << "ERROR [ElectronSF]: Could not find histogram for SF reweighting" << endl;
 
   hmueTriggerSF = (TH2F*) MuElSF_trig->Get("scalefactor_eta2d_with_syst")->Clone("mueTriggerSF");
@@ -164,10 +174,9 @@ void Analyzer::Loop() {
       weight *= genWeight;
     //genWeight>0 ? weight *= 1. : weight *= -1.;
     
-    // MET filters for now all OFF
+    // MET filters
     //----------------------------------------------------------------------------
-    if (false) 
-      if (!(Flag_HBHENoiseFilter && Flag_CSCTightHaloFilter && Flag_goodVertices && Flag_eeBadScFilter)) continue;
+    if (!(Flag_HBHENoiseFilter && Flag_CSCTightHaloFilter && Flag_goodVertices && Flag_eeBadScFilter && Flag_EcalDeadCellTriggerPrimitiveFilter)) continue;
 
     // Vertex Select
     numberVertices = nVert;
@@ -178,8 +187,8 @@ void Analyzer::Loop() {
     h_VertexNoReweight->Fill(numberVertices, weight);
     /// ***PU reweghting*** ///
     if (!isData)
-      //weight *= reweightPU->GetWeight(nTrueInt);
-      weight *= puWeight;
+      weight *= reweightPU->GetWeight(nTrueInt);
+      //weight *= puWeight;
     h_VertexPostReweight->Fill(numberVertices, weight);
 
 
@@ -298,58 +307,78 @@ void Analyzer::Loop() {
       ///Filling standard particle plots END
 
       //Making leptons and jets selected collections
-      // it seems more convinent to take only two leptons, once the triggers are set we need to add the here FIXME 
-      if (muonCollLoose.size()==2 && muonColl.size()==2 && electronCollLoose.size()==0 && (!isData || (isDoubleMu && HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v>0) ) ) {
-	invMtemp=0;
-	if (muonColl[0].charge()*muonColl[1].charge()<0 && muonColl[0].lorentzVec().Pt()>20) 
-	  invMtemp = (muonColl[0].lorentzVec()+muonColl[1].lorentzVec()).M();
-	if (invMtemp>15) {
-	  leptonSelect.push_back(muonColl[0]);
-	  leptonSelect.push_back(muonColl[1]);
-	  selectChannel.push_back(0);
-	  selectChannel.push_back(1);
-	  selectChannel.push_back(3);
+      // it seems more convinent to take only two leptons, once the triggers are set we need to add the here FIXME
+      invMtemp=0.;
+      if (sysvar==CentralValue) {
+	if (electronCollLoose.size()==2 && muonCollLoose.size()==0 && electronColl.size()==2 && (!isData || (isDoubleEl && HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v>0) ) ) {
+	  if (electronColl[0].charge()*electronColl[1].charge()<0 && electronColl[0].lorentzVec().Pt()>25) 
+	    invMtemp = (electronColl[0].lorentzVec()+electronColl[1].lorentzVec()).M();
+	  if (invMtemp>15) {
+	    leptonSelect.clear();
+	    leptonSelect.push_back(electronColl[0]);
+	    leptonSelect.push_back(electronColl[1]);
+	    selectChannel.push_back(0);
+	    selectChannel.push_back(1);
+	    selectChannel.push_back(2);
+	    weight *= ElTriggersLumi/integratedlumi;
+	    //Trigger EE Eff
+	    electronColl[0].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=electronColl[0].lorentzVec().Pt();
+	    weight *= heeTriggerSF23->GetBinContent( heeTriggerSF23->FindBin( fabs(ptSFlimit), fabs(electronColl[0].lorentzVec().Eta()) ) );
+	    electronColl[1].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=electronColl[1].lorentzVec().Pt();
+	    weight *= heeTriggerSF12->GetBinContent( heeTriggerSF12->FindBin( fabs(ptSFlimit), fabs(electronColl[1].lorentzVec().Eta()) ) );
+	    goto channelfound;
+	  }
+	}
+	if (electronCollLoose.size()==0 && muonCollLoose.size()==2 && muonColl.size()==2 && (!isData || (isDoubleMu && HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v>0) ) ) {
+	  if (muonColl[0].charge()*muonColl[1].charge()<0 && muonColl[0].lorentzVec().Pt()>25) 
+	    invMtemp = (muonColl[0].lorentzVec()+muonColl[1].lorentzVec()).M();
+	  if (invMtemp>15) {
+	    leptonSelect.push_back(muonColl[0]);
+	    leptonSelect.push_back(muonColl[1]);
+	    selectChannel.push_back(0);
+	    selectChannel.push_back(1);
+	    selectChannel.push_back(3);
+	    weight *= MuTriggersLumi/integratedlumi;
+	    //Trigger MuMu Eff
+	    muonColl[0].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=muonColl[0].lorentzVec().Pt();
+	    weight *= hmumuTriggerSF17->GetBinContent( hmumuTriggerSF17->FindBin( fabs(ptSFlimit), fabs(muonColl[0].lorentzVec().Eta()) ) );
+	    muonColl[1].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=muonColl[1].lorentzVec().Pt();
+	    weight *= hmumuTriggerSF8->GetBinContent( hmumuTriggerSF8->FindBin( fabs(ptSFlimit), fabs(muonColl[1].lorentzVec().Eta()) ) );
+	    goto channelfound;
+	  }
+	}
+	if (electronCollLoose.size()==1 && electronColl.size()==1 && muonCollLoose.size()==1 && muonColl.size()==1 && (!isData || (isMuEG && (HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v>0 || HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v>0) ) ) ) {
+	  if (muonColl[0].charge()*electronColl[0].charge()<0 && (electronColl[0].lorentzVec().Pt()>25 || muonColl[0].lorentzVec().Pt()>25)) 
+	    invMtemp = (muonColl[0].lorentzVec()+electronColl[0].lorentzVec()).M();
+	  if (invMtemp>15) {
+	    leptonSelect.clear();
+	    leptonSelect.push_back(muonColl[0]);
+	    leptonSelect.push_back(electronColl[0]);
+	    selectChannel.push_back(0);
+	    selectChannel.push_back(4);
+	    //Trigger SF
+	    weight *= hmueTriggerSF->GetBinContent( hmueTriggerSF->FindBin( fabs(leptonSelect[0].lorentzVec().Eta()),fabs(leptonSelect[1].lorentzVec().Eta()) ) );
+	    goto channelfound;
+	  }
 	}
       }
-      if (electronCollLoose.size()==2 && electronColl.size()==2 && muonCollLoose.size()==0 && (!isData || (isDoubleEl && HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v>0) ) ) {
-	invMtemp=0;
-	if (electronColl[0].charge()*electronColl[1].charge()<0 && electronColl[0].lorentzVec().Pt()>20) 
-	  invMtemp = (electronColl[0].lorentzVec()+electronColl[1].lorentzVec()).M();
-	if (invMtemp>15) {
-	  leptonSelect.clear();
-	  leptonSelect.push_back(electronColl[0]);
-	  leptonSelect.push_back(electronColl[1]);
-	  selectChannel.push_back(0);
-	  selectChannel.push_back(1);
-	  selectChannel.push_back(2);
-	}
-      }
-      if (muonCollLoose.size()==1 && muonColl.size()==1 && electronCollLoose.size()==1 && electronColl.size()==1 && (!isData || (isMuEG && (HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v>0 || HLT_BIT_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v) ) ) ) {
-	invMtemp=0;
-	if (muonColl[0].charge()*electronColl[0].charge()<0 && (electronColl[0].lorentzVec().Pt()>20 || muonColl[0].lorentzVec().Pt()>20)) 
-	  invMtemp = (muonColl[0].lorentzVec()+electronColl[0].lorentzVec()).M();
-	if (invMtemp>15) {
-	  leptonSelect.clear();
-	  leptonSelect.push_back(muonColl[0]);
-	  leptonSelect.push_back(electronColl[0]);
-	  selectChannel.push_back(0);
-	  selectChannel.push_back(4);
-	}
-      }
+    channelfound:
       if (leptonSelect.size()<2) continue; // no less than two leptons
       if(debug) cout<< "two leptons found" <<endl;
 
-      // applying scaling factor for ID and triggers (now that we have selected the event type)
-      if (!isData && sysvar==CentralValue && false) {
-	//trigger SF only for emu but applied to both FIXME
-	weight *= hmueTriggerSF->GetBinContent( hmueTriggerSF->FindBin( fabs(leptonSelect[0].lorentzVec().Eta()),fabs(leptonSelect[1].lorentzVec().Eta()) ) );
-      
-	//ID SF applied per lepton
+      // applying scaling factor for ID
+      if (!isData && sysvar==CentralValue) {
 	for (UInt_t i=0; i<leptonSelect.size(); i++) {
-	  if (leptonSelect[i].leptonType()==1)
-	    weight *= heIDSF->GetBinContent( hmueTriggerSF->FindBin( leptonSelect[i].lorentzVec().Eta(),fabs(leptonSelect[i].lorentzVec().Pt()) ) );
-	  if (leptonSelect[i].leptonType()==0)
-	    weight *= hmuIDSF->GetBinContent( hmueTriggerSF->FindBin( leptonSelect[i].lorentzVec().Eta(),fabs(leptonSelect[i].lorentzVec().Pt()) ) );
+	  //ID SF applied per lepton
+	  leptonSelect[i].lorentzVec().Pt()>199. ? ptSFlimit=199. : ptSFlimit=leptonSelect[i].lorentzVec().Pt();
+	  if (leptonSelect[i].leptonType()==1) {
+	    weight *= heIDSF->GetBinContent( heIDSF->FindBin( leptonSelect[i].lorentzVec().Eta(),ptSFlimit ) );
+	  }
+	  if (leptonSelect[i].leptonType()==0) {
+	    if (ptSFlimit!=199.) leptonSelect[i].lorentzVec().Pt()<21. ? ptSFlimit=21. : ptSFlimit=leptonSelect[i].lorentzVec().Pt();
+	    weight *= hmuIDSF->GetBinContent( hmuIDSF->FindBin( fabs(leptonSelect[i].lorentzVec().Eta()),ptSFlimit ) );		    
+	    weight *= hmuISOSF->GetBinContent( hmuISOSF->FindBin( fabs(leptonSelect[i].lorentzVec().Eta()),ptSFlimit ) );
+	  }
 	}
       }
       if(debug) cout<< "trigger and ID weights applied" <<endl;
@@ -359,12 +388,29 @@ void Analyzer::Loop() {
 	Zveto=false;
       else
 	Zveto=true;
-      
+    
       // filling plots for the dilepton selection
       for (UInt_t n=0;n<selectChannel.size();n++) {
 	UInt_t channel = selectChannel[n];
-	if (sysvar==CentralValue)
+	if (sysvar==CentralValue) {
 	  h_signal[1][channel]->Fill(numberVertices, valueMET[sysvar], valueMETPhi[sysvar], leptonSelect, jetSelect, weight, channel, 1);
+	  for (Int_t i=0; i<muonColl.size(); i++) {
+	    index=muonColl[i].ilepton();
+	    h_muons[1][channel]->Fill(weight, (Int_t) muonColl.size(), muonColl[i].lorentzVec(), muonColl[i].charge(), muonColl[i].relIso(), muonColl[i].chiNdof(), muonColl[i].dxy_BS(), muonColl[i].dz_BS());
+	  }
+	  for (UInt_t i=0; i<electronColl.size(); i++) {
+	    index=electronColl[i].ilepton();
+	    h_electrons[1][channel]->Fill(weight, (Int_t) electronColl.size(), electronColl[i].lorentzVec(), electronColl[i].charge(), electronColl[i].relIso(), electronColl[i].dxy_BS(), electronColl[i].dz_BS());
+	  }
+	  for (int i=0; i<jetColl[sysvar].size(); i++) {
+	    index=jetColl[sysvar][i].ijet();
+	    h_jets[1][channel]->Fill(weight, (Int_t) jetColl[sysvar].size(), jetColl[sysvar][i].lorentzVec(), Jet_btagCSV[index], Jet_btagCMVA[index] );
+	  }
+	  for (int i=0; i<bjetColl[sysvar].size(); i++) {
+	    index=bjetColl[sysvar][i].ijet();
+	    h_bjets[1][channel]->Fill(weight, (Int_t) bjetColl[sysvar].size(), bjetColl[sysvar][i].lorentzVec(), Jet_btagCSV[index], Jet_btagCMVA[index] );
+	  }
+	}
 	else
 	  h_systematics[1][channel][sysvar-1]->Fill(numberVertices, valueMET[sysvar], valueMETPhi[sysvar], leptonSelect, jetSelect, weight, channel, 1);
 	
@@ -428,13 +474,13 @@ void Analyzer::Loop() {
       met_cut = 40;
 
       // selection events, signal and control regions
-      if (leptonSelect.size()>1 && Zveto && jetColl[sysvar].size()>1)
+      if (leptonSelect.size()>1 && Zveto && jetSelect.size()>1)
 	selectionStep.push_back(2);
-      if (leptonSelect.size()>1 && Zveto && jetColl[sysvar].size()>1 && valueMET[sysvar]>met_cut)
+      if (leptonSelect.size()>1 && Zveto && jetSelect.size()>1 && valueMET[sysvar]>met_cut)
 	selectionStep.push_back(3);
-      if (leptonSelect.size()>1 && Zveto && jetColl[sysvar].size()>1 && valueMET[sysvar]>met_cut && bjetColl[sysvar].size()>0)
+      if (leptonSelect.size()>1 && Zveto && jetSelect.size()>1 && valueMET[sysvar]>met_cut && bjetColl[sysvar].size()>0)
 	selectionStep.push_back(4);
-      if (leptonSelect.size()>1 && Zveto && jetColl[sysvar].size()>1 && valueMET[sysvar]>met_cut && bjetColl[sysvar].size()>1)
+      if (leptonSelect.size()>1 && Zveto && jetSelect.size()>1 && valueMET[sysvar]>met_cut && bjetColl[sysvar].size()>1)
 	selectionStep.push_back(5);
       /*
 	if (leptonSelect.size()>1 && jetColl.size()>1 && !Zveto)
@@ -447,13 +493,13 @@ void Analyzer::Loop() {
 	selectionStep.push_back(9);
       */
       // event selection for ZDY normalization 
-      if (leptonSelect.size()>1 && jetColl[sysvar].size()>1)
+      if (leptonSelect.size()>1 && jetSelect.size()>1)
 	selectionStepZDY.push_back(2);
-      if (leptonSelect.size()>1 && jetColl[sysvar].size()>1 && valueMET[sysvar]>met_cut)
+      if (leptonSelect.size()>1 && jetSelect.size()>1 && valueMET[sysvar]>met_cut)
 	selectionStepZDY.push_back(3);
-      if (leptonSelect.size()>1 && jetColl[sysvar].size()>1 && valueMET[sysvar]>met_cut && bjetColl[sysvar].size()>0)
+      if (leptonSelect.size()>1 && jetSelect.size()>1 && valueMET[sysvar]>met_cut && bjetColl[sysvar].size()>0)
 	selectionStepZDY.push_back(4);
-      if (leptonSelect.size()>1 && jetColl[sysvar].size()>1 && valueMET[sysvar]>met_cut && bjetColl[sysvar].size()>1)
+      if (leptonSelect.size()>1 && jetSelect.size()>1 && valueMET[sysvar]>met_cut && bjetColl[sysvar].size()>1)
 	selectionStepZDY.push_back(5);
       if (debug) cout << "Filling final histos" << endl;
       if (sysvar==CentralValue) {

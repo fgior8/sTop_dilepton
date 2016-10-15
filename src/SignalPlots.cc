@@ -60,16 +60,15 @@ void SignalPlots::Fill(UInt_t numberVertices, Double_t MET, Double_t MET_phi, st
   }
   h_HT->Fill(HT,weight);
   h_ST->Fill(ST,weight);
-  h_METoverHT->Fill(pow(MET,2)/HT,weight);
   h_METoverST->Fill(pow(MET,2)/ST,weight);
   h_llmass->Fill( (leptons[i].lorentzVec()+leptons[j].lorentzVec()).M(),weight);
   h_llpt->Fill( (leptons[i].lorentzVec()+leptons[j].lorentzVec()).Pt(),weight); 
   h_MT2ll->Fill(getMT2(leptons[i].lorentzVec(), leptons[j].lorentzVec(), MET, MET_phi), weight);
 
-  if (cut>1 && cut!=3 && cut!=4) {
+  if (cut>1) {
     h_MT2bb->Fill( getMT2bb(jets, leptons, MET, MET_phi), weight);
     h_MT2lblb->Fill( getMT2lblb(jets, leptons, MET, MET_phi), weight);  
-
+    h_METoverHT->Fill(pow(MET,2)/HT,weight);
     h_jjmass->Fill( (jets[m].lorentzVec()+jets[n].lorentzVec()).M(),weight);
     h_lljjmass->Fill( (leptons[i].lorentzVec()+leptons[j].lorentzVec()+jets[m].lorentzVec()+jets[n].lorentzVec()).M(),weight);
     h_l1jjmass->Fill( (leptons[i].lorentzVec()+jets[m].lorentzVec()+jets[n].lorentzVec()).M(),weight);
