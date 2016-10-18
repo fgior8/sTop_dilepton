@@ -8,10 +8,12 @@ Analyzer::Analyzer() {
   // PILEUP //
   reweightPU = new ReweightPU("/gpfs/csic_projects/cms/fgior8/PileUpDistr/EnDataPileupHistogram.root");
   //if (debug) cout<< "PU histos loaded" <<endl;
-
+  // Tracker HIP //
+  HIP_muon = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/ratios.root");
+  hHIP_muon = (TGraphAsymmErrors*) HIP_muon->Get("ratio_eta")->Clone("HIP_muon");
   // Scale Factors ///
   // --first for the trigger-- //
-  MuSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/HLT_Efficiencies_4fb_2016.root"); //only EMu for the moment //FIXME
+  MuSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/HLT_Efficiencies_4fb_2016.root"); 
   ElSF_trig   = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/HLT_Efficiencies_4fb_2016.root");
   MuElSF_trig = TFile::Open("/gpfs/csic_projects/cms/fgior8/ScaleFactors/triggerSummary_emu_13TeV_RunD.root");
   if(!MuElSF_trig)
@@ -378,6 +380,7 @@ void Analyzer::Loop() {
 	    if (ptSFlimit!=199.) leptonSelect[i].lorentzVec().Pt()<21. ? ptSFlimit=21. : ptSFlimit=leptonSelect[i].lorentzVec().Pt();
 	    weight *= hmuIDSF->GetBinContent( hmuIDSF->FindBin( fabs(leptonSelect[i].lorentzVec().Eta()),ptSFlimit ) );		    
 	    weight *= hmuISOSF->GetBinContent( hmuISOSF->FindBin( fabs(leptonSelect[i].lorentzVec().Eta()),ptSFlimit ) );
+	    weight *= hHIP_muon->Eval(leptonSelect[i].lorentzVec().Eta());
 	  }
 	}
       }

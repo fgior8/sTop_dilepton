@@ -5,6 +5,7 @@
 #include "TTree.h"
 #include "Data.h"
 #include "TH2F.h"
+#include "TGraphAsymmErrors.h"
 #include "Reweight.h"
 #include "BTagSFUtil.h"
 #include "SignalPlots.h"
@@ -42,9 +43,11 @@ class Analyzer : public Data {
   //SF parametrization
   TFile *MuSF_trig, *ElSF_trig, *MuElSF_trig;
   TFile *MuSF_ID, *MuSF_ISO, *ElSF_IDISO;
+  TFile *HIP_muon;
   TH2F *hmuIDSF, *hmuISOSF, *hmumuTriggerSF8, *hmumuTriggerSF17;
   TH2F *heIDSF, *heeTriggerSF12, *heeTriggerSF23;
   TH2F *hmueTriggerSF;
+  TGraphAsymmErrors *hHIP_muon;
   Float_t ptSFlimit;
   //SF
 
