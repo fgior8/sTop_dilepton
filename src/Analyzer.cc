@@ -204,6 +204,9 @@ void Analyzer::Loop() {
     for (UInt_t kk=0;kk<nsystematics+1;kk++) {//nsystematics
       jetColl[kk].clear(); bjetColl[kk].clear(); jetHTColl[kk].clear();
     }
+    //cleaning selection vectors
+    selectionStep.clear();    selectChannel.clear();   selectionStepZDY.clear();
+    jetSelect.clear();    leptonSelect.clear();
     
     Muon.SetPt(15);
     Muon.SetEta(2.4);
@@ -264,127 +267,126 @@ void Analyzer::Loop() {
     }
     if ( jetColl[0].size()>1 )
       h_prova->Fill(1000);
-    
+
+    ///Filling standard particle plots
+    if(muonColl.size()>0)
+      for (Int_t i=0; i<muonColl.size(); i++) {
+	index=muonColl[i].ilepton();
+	h_muons[0][0]->Fill(weight, (Int_t) muonColl.size(), muonColl[i].lorentzVec(), muonColl[i].charge(), muonColl[i].relIso(), muonColl[i].chiNdof(), muonColl[i].dxy_BS(), muonColl[i].dz_BS());
+      }
+    if (electronColl.size() > 0) {
+      for (UInt_t i=0; i<electronColl.size(); i++) {
+	index=electronColl[i].ilepton();
+	h_electrons[0][0]->Fill(weight, (Int_t) electronColl.size(), electronColl[i].lorentzVec(), electronColl[i].charge(), electronColl[i].relIso(), electronColl[i].dxy_BS(), electronColl[i].dz_BS());
+      }
+    }  
+    if(jetHTColl[0].size()>0)
+      for (int i=0; i<jetHTColl[0].size(); i++) {
+	index=jetHTColl[0][i].ijet();
+	h_HTjets[0][0]->Fill(weight, (Int_t) jetHTColl[0].size(), jetHTColl[0][i].lorentzVec(), Jet_btagCSV[index], Jet_btagCMVA[index] );
+      }
+    if(jetColl[0].size()>0)
+      for (int i=0; i<jetColl[0].size(); i++) {
+	index=jetColl[0][i].ijet();
+	h_jets[0][0]->Fill(weight, (Int_t) jetColl[0].size(), jetColl[0][i].lorentzVec(), Jet_btagCSV[index], Jet_btagCMVA[index] );
+      }
+    if(bjetColl[0].size()>0)
+      for (int i=0; i<bjetColl[0].size(); i++) {
+	index=bjetColl[0][i].ijet();
+	h_bjets[0][0]->Fill(weight, (Int_t) bjetColl[0].size(), bjetColl[0][i].lorentzVec(), Jet_btagCSV[index], Jet_btagCMVA[index] );
+      }
+    if(debug) cout<< "generic plots FILLED" <<endl;
+    ///Filling standard particle plots END
+
+
+    invMtemp=0.;
+    if (electronCollLoose.size()==2 && muonCollLoose.size()==0 && electronColl.size()==2 && (!isData || (isDoubleEl && HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v>0) ) ) {
+      if (electronColl[0].charge()*electronColl[1].charge()<0 && electronColl[0].lorentzVec().Pt()>25) 
+	invMtemp = (electronColl[0].lorentzVec()+electronColl[1].lorentzVec()).M();
+      if (invMtemp>15) {
+	leptonSelect.clear();
+	leptonSelect.push_back(electronColl[0]);
+	leptonSelect.push_back(electronColl[1]);
+	selectChannel.push_back(0);
+	selectChannel.push_back(1);
+	selectChannel.push_back(2);
+	if (!isData) {
+	  weight *= ElTriggersLumi/integratedlumi;
+	  //Trigger EE Eff
+	  electronColl[0].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=electronColl[0].lorentzVec().Pt();
+	  weight *= heeTriggerSF23->GetBinContent( heeTriggerSF23->FindBin( fabs(ptSFlimit), fabs(electronColl[0].lorentzVec().Eta()) ) );
+	  electronColl[1].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=electronColl[1].lorentzVec().Pt();
+	  weight *= heeTriggerSF12->GetBinContent( heeTriggerSF12->FindBin( fabs(ptSFlimit), fabs(electronColl[1].lorentzVec().Eta()) ) );
+	}
+	goto channelfound;
+      }
+    }
+    if (electronCollLoose.size()==0 && muonCollLoose.size()==2 && muonColl.size()==2 && (!isData || (isDoubleMu && HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v>0) ) ) {
+      if (muonColl[0].charge()*muonColl[1].charge()<0 && muonColl[0].lorentzVec().Pt()>25) 
+	invMtemp = (muonColl[0].lorentzVec()+muonColl[1].lorentzVec()).M();
+      if (invMtemp>15) {
+	leptonSelect.push_back(muonColl[0]);
+	leptonSelect.push_back(muonColl[1]);
+	selectChannel.push_back(0);
+	selectChannel.push_back(1);
+	selectChannel.push_back(3);
+	if (!isData) {
+	  weight *= MuTriggersLumi/integratedlumi;
+	  //Trigger MuMu Eff
+	  muonColl[0].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=muonColl[0].lorentzVec().Pt();
+	  weight *= hmumuTriggerSF17->GetBinContent( hmumuTriggerSF17->FindBin( fabs(ptSFlimit), fabs(muonColl[0].lorentzVec().Eta()) ) );
+	  muonColl[1].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=muonColl[1].lorentzVec().Pt();
+	  weight *= hmumuTriggerSF8->GetBinContent( hmumuTriggerSF8->FindBin( fabs(ptSFlimit), fabs(muonColl[1].lorentzVec().Eta()) ) );
+	}
+	goto channelfound;
+      }
+    }
+    if (electronCollLoose.size()==1 && electronColl.size()==1 && muonCollLoose.size()==1 && muonColl.size()==1 && (!isData || (isMuEG && (HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v>0 || HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v>0) ) ) ) {
+      if (muonColl[0].charge()*electronColl[0].charge()<0 && (electronColl[0].lorentzVec().Pt()>25 || muonColl[0].lorentzVec().Pt()>25)) 
+	invMtemp = (muonColl[0].lorentzVec()+electronColl[0].lorentzVec()).M();
+      if (invMtemp>15) {
+	leptonSelect.clear();
+	leptonSelect.push_back(muonColl[0]);
+	leptonSelect.push_back(electronColl[0]);
+	selectChannel.push_back(0);
+	selectChannel.push_back(4);
+	//Trigger SF
+	if (!isData) {
+	  weight *= hmueTriggerSF->GetBinContent( hmueTriggerSF->FindBin( fabs(leptonSelect[0].lorentzVec().Eta()),fabs(leptonSelect[1].lorentzVec().Eta()) ) );
+	}
+	goto channelfound;
+      }
+    }
+  channelfound:
+    if (leptonSelect.size()<2) continue; // no less than two leptons
+    if(debug) cout<< "two leptons found" <<endl;
+
+    // applying scaling factor for ID
+    if (!isData) {
+      for (UInt_t i=0; i<leptonSelect.size(); i++) {
+	//ID SF applied per lepton
+	leptonSelect[i].lorentzVec().Pt()>199. ? ptSFlimit=199. : ptSFlimit=leptonSelect[i].lorentzVec().Pt();
+	if (leptonSelect[i].leptonType()==1) {
+	  weight *= heIDSF->GetBinContent( heIDSF->FindBin( leptonSelect[i].lorentzVec().Eta(),ptSFlimit ) );
+	}
+	if (leptonSelect[i].leptonType()==0) {
+	  if (ptSFlimit!=199.) leptonSelect[i].lorentzVec().Pt()<21. ? ptSFlimit=21. : ptSFlimit=leptonSelect[i].lorentzVec().Pt();
+	  weight *= hmuIDSF->GetBinContent( hmuIDSF->FindBin( fabs(leptonSelect[i].lorentzVec().Eta()),ptSFlimit ) );		    
+	  weight *= hmuISOSF->GetBinContent( hmuISOSF->FindBin( fabs(leptonSelect[i].lorentzVec().Eta()),ptSFlimit ) );
+	  weight *= hHIP_muon->Eval(leptonSelect[i].lorentzVec().Eta());
+	}
+      }
+    }
+    if(debug) cout<< "trigger and ID weights applied" <<endl;
+  
     if(debug) cout<< "DONE object selection" <<endl;
     for (Variation sysvar=(Analyzer::Variation)0;sysvar<nsystematics+1;sysvar=(Analyzer::Variation)(sysvar+1)) {
       if (debug) cout << "Looking at sys n " << sysvar << endl;
-      selectionStep.clear();    selectChannel.clear();   selectionStepZDY.clear();
-      jetSelect.clear();    leptonSelect.clear();
       
       HT=0;
       for (int i=0; i<jetHTColl[sysvar].size(); i++) 
 	HT += jetHTColl[sysvar][i].lorentzVec().Pt();
-      
-      ///Filling standard particle plots
-      if (sysvar==CentralValue) {
-	if(muonColl.size()>0)
-	  for (Int_t i=0; i<muonColl.size(); i++) {
-	    index=muonColl[i].ilepton();
-	    h_muons[0][0]->Fill(weight, (Int_t) muonColl.size(), muonColl[i].lorentzVec(), muonColl[i].charge(), muonColl[i].relIso(), muonColl[i].chiNdof(), muonColl[i].dxy_BS(), muonColl[i].dz_BS());
-	  }
-	if (electronColl.size() > 0) {
-	  for (UInt_t i=0; i<electronColl.size(); i++) {
-	    index=electronColl[i].ilepton();
-	    h_electrons[0][0]->Fill(weight, (Int_t) electronColl.size(), electronColl[i].lorentzVec(), electronColl[i].charge(), electronColl[i].relIso(), electronColl[i].dxy_BS(), electronColl[i].dz_BS());
-	  }
-	}  
-	if(jetHTColl[sysvar].size()>0)
-	  for (int i=0; i<jetHTColl[sysvar].size(); i++) {
-	    index=jetHTColl[sysvar][i].ijet();
-	    h_HTjets[0][0]->Fill(weight, (Int_t) jetHTColl[sysvar].size(), jetHTColl[sysvar][i].lorentzVec(), Jet_btagCSV[index], Jet_btagCMVA[index] );
-	  }
-	if(jetColl[sysvar].size()>0)
-	  for (int i=0; i<jetColl[sysvar].size(); i++) {
-	    index=jetColl[sysvar][i].ijet();
-	    h_jets[0][0]->Fill(weight, (Int_t) jetColl[sysvar].size(), jetColl[sysvar][i].lorentzVec(), Jet_btagCSV[index], Jet_btagCMVA[index] );
-	  }
-	if(bjetColl[sysvar].size()>0)
-	  for (int i=0; i<bjetColl[sysvar].size(); i++) {
-	    index=bjetColl[sysvar][i].ijet();
-	    h_bjets[0][0]->Fill(weight, (Int_t) bjetColl[sysvar].size(), bjetColl[sysvar][i].lorentzVec(), Jet_btagCSV[index], Jet_btagCMVA[index] );
-	  }
-      }
-      if(debug) cout<< "generic plots FILLED" <<endl;
 
-      ///Filling standard particle plots END
-
-      //Making leptons and jets selected collections
-      // it seems more convinent to take only two leptons, once the triggers are set we need to add the here FIXME
-      invMtemp=0.;
-      if (sysvar==CentralValue) {
-	if (electronCollLoose.size()==2 && muonCollLoose.size()==0 && electronColl.size()==2 && (!isData || (isDoubleEl && HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v>0) ) ) {
-	  if (electronColl[0].charge()*electronColl[1].charge()<0 && electronColl[0].lorentzVec().Pt()>25) 
-	    invMtemp = (electronColl[0].lorentzVec()+electronColl[1].lorentzVec()).M();
-	  if (invMtemp>15) {
-	    leptonSelect.clear();
-	    leptonSelect.push_back(electronColl[0]);
-	    leptonSelect.push_back(electronColl[1]);
-	    selectChannel.push_back(0);
-	    selectChannel.push_back(1);
-	    selectChannel.push_back(2);
-	    weight *= ElTriggersLumi/integratedlumi;
-	    //Trigger EE Eff
-	    electronColl[0].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=electronColl[0].lorentzVec().Pt();
-	    weight *= heeTriggerSF23->GetBinContent( heeTriggerSF23->FindBin( fabs(ptSFlimit), fabs(electronColl[0].lorentzVec().Eta()) ) );
-	    electronColl[1].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=electronColl[1].lorentzVec().Pt();
-	    weight *= heeTriggerSF12->GetBinContent( heeTriggerSF12->FindBin( fabs(ptSFlimit), fabs(electronColl[1].lorentzVec().Eta()) ) );
-	    goto channelfound;
-	  }
-	}
-	if (electronCollLoose.size()==0 && muonCollLoose.size()==2 && muonColl.size()==2 && (!isData || (isDoubleMu && HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v>0) ) ) {
-	  if (muonColl[0].charge()*muonColl[1].charge()<0 && muonColl[0].lorentzVec().Pt()>25) 
-	    invMtemp = (muonColl[0].lorentzVec()+muonColl[1].lorentzVec()).M();
-	  if (invMtemp>15) {
-	    leptonSelect.push_back(muonColl[0]);
-	    leptonSelect.push_back(muonColl[1]);
-	    selectChannel.push_back(0);
-	    selectChannel.push_back(1);
-	    selectChannel.push_back(3);
-	    weight *= MuTriggersLumi/integratedlumi;
-	    //Trigger MuMu Eff
-	    muonColl[0].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=muonColl[0].lorentzVec().Pt();
-	    weight *= hmumuTriggerSF17->GetBinContent( hmumuTriggerSF17->FindBin( fabs(ptSFlimit), fabs(muonColl[0].lorentzVec().Eta()) ) );
-	    muonColl[1].lorentzVec().Pt()>=500. ? ptSFlimit=499. : ptSFlimit=muonColl[1].lorentzVec().Pt();
-	    weight *= hmumuTriggerSF8->GetBinContent( hmumuTriggerSF8->FindBin( fabs(ptSFlimit), fabs(muonColl[1].lorentzVec().Eta()) ) );
-	    goto channelfound;
-	  }
-	}
-	if (electronCollLoose.size()==1 && electronColl.size()==1 && muonCollLoose.size()==1 && muonColl.size()==1 && (!isData || (isMuEG && (HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v>0 || HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v>0) ) ) ) {
-	  if (muonColl[0].charge()*electronColl[0].charge()<0 && (electronColl[0].lorentzVec().Pt()>25 || muonColl[0].lorentzVec().Pt()>25)) 
-	    invMtemp = (muonColl[0].lorentzVec()+electronColl[0].lorentzVec()).M();
-	  if (invMtemp>15) {
-	    leptonSelect.clear();
-	    leptonSelect.push_back(muonColl[0]);
-	    leptonSelect.push_back(electronColl[0]);
-	    selectChannel.push_back(0);
-	    selectChannel.push_back(4);
-	    //Trigger SF
-	    weight *= hmueTriggerSF->GetBinContent( hmueTriggerSF->FindBin( fabs(leptonSelect[0].lorentzVec().Eta()),fabs(leptonSelect[1].lorentzVec().Eta()) ) );
-	    goto channelfound;
-	  }
-	}
-      }
-    channelfound:
-      if (leptonSelect.size()<2) continue; // no less than two leptons
-      if(debug) cout<< "two leptons found" <<endl;
-
-      // applying scaling factor for ID
-      if (!isData && sysvar==CentralValue) {
-	for (UInt_t i=0; i<leptonSelect.size(); i++) {
-	  //ID SF applied per lepton
-	  leptonSelect[i].lorentzVec().Pt()>199. ? ptSFlimit=199. : ptSFlimit=leptonSelect[i].lorentzVec().Pt();
-	  if (leptonSelect[i].leptonType()==1) {
-	    weight *= heIDSF->GetBinContent( heIDSF->FindBin( leptonSelect[i].lorentzVec().Eta(),ptSFlimit ) );
-	  }
-	  if (leptonSelect[i].leptonType()==0) {
-	    if (ptSFlimit!=199.) leptonSelect[i].lorentzVec().Pt()<21. ? ptSFlimit=21. : ptSFlimit=leptonSelect[i].lorentzVec().Pt();
-	    weight *= hmuIDSF->GetBinContent( hmuIDSF->FindBin( fabs(leptonSelect[i].lorentzVec().Eta()),ptSFlimit ) );		    
-	    weight *= hmuISOSF->GetBinContent( hmuISOSF->FindBin( fabs(leptonSelect[i].lorentzVec().Eta()),ptSFlimit ) );
-	    weight *= hHIP_muon->Eval(leptonSelect[i].lorentzVec().Eta());
-	  }
-	}
-      }
-      if(debug) cout<< "trigger and ID weights applied" <<endl;
       // Z veto applied only for same flavor
       if ( ((leptonSelect[0].leptonType()==0 && leptonSelect[1].leptonType()==0) || (leptonSelect[0].leptonType()==1 && leptonSelect[1].leptonType()==1)) &&
 	   ( fabs((leptonSelect[0].lorentzVec()+leptonSelect[1].lorentzVec()).M()-Mass_Z)<15 ) )
