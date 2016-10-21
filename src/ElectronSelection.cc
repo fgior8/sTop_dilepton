@@ -75,15 +75,15 @@ void ElectronSel::ElectronSelection(Int_t nElectron, Int_t *pdgId, Float_t *EtaS
   
 }
 
-void ElectronSel::ElectronSelectionWithLoose(Int_t nElectron, Int_t *pdgId, Float_t *EtaSc, Float_t *Pt, Float_t *Px, Float_t *Py, Float_t *Pz, Float_t *E, Float_t *relIso, Int_t *Charge, Int_t *passConversionVeto, Int_t *MissingHits, Float_t *DeltaEtaTrkSC, Float_t *DeltaPhiTrkSC, Float_t *SigmaIEtaIEta, Float_t *HoE, Float_t *eInvMinusPInv, Float_t *dxy_var, Float_t *dz_var, std::vector<Lepton>& leptonColl, std::vector<Lepton>& leptonCollLoose) {
+void ElectronSel::ElectronSelectionWithLoose(Int_t nElectron, Int_t *pdgId, Float_t *EtaSc, Float_t *Pt, Float_t *Px, Float_t *Py, Float_t *Pz, Float_t *E, Float_t *relIso, Int_t *Charge, Int_t *passConversionVeto, Int_t *MissingHits, Float_t *DeltaEtaTrkSC, Float_t *DeltaPhiTrkSC, Float_t *SigmaIEtaIEta, Float_t *HoE, Float_t *eInvMinusPInv, Float_t *dxy_var, Float_t *dz_var, Int_t *mcMatchId, std::vector<Lepton>& leptonColl, std::vector<Lepton>& leptonCollLoose) {
 
   D0=D0Error=0.;
-   
-  for (UInt_t ilep=0; ilep<sizeof(Pt); ilep++) {
+
+  for (UInt_t ilep=0; ilep<nElectron; ilep++) {
     if (fabs(pdgId[ilep])!=11) continue;
     if ( fabs(EtaSc[ilep])>1.4442 && fabs(EtaSc[ilep])<1.566 ) continue;
-    fabs(EtaSc[ilep])<=1.4442 ? isEB=true : isEB=false;
-    fabs(EtaSc[ilep])>=1.566 ? isEE=true : isEE=false;  
+    fabs(EtaSc[ilep])<=1.479 ? isEB=true : isEB=false;
+    fabs(EtaSc[ilep])>1.479 ? isEE=true : isEE=false;  
     if (!(isEB || isEE)) continue;
 
     vLepton.SetPxPyPzE(Px[ilep], Py[ilep], Pz[ilep], E[ilep]);

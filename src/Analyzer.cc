@@ -214,14 +214,14 @@ void Analyzer::Loop() {
     Muon.SetChiNdof(10);
     Muon.SetBSdxy(0.20);
     Muon.SetBSdz(0.50);
-    Muon.MuonSelectionWithLoose(nLepGood, LepGood_pdgId, LepGood_pfMuonId, LepGood_isGlobalMuon, LepGood_isTrackerMuon, LepGood_eta, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_trackerHits, LepGood_pixelLayers, LepGood_nStations, LepGood_trackerLayers, LepGood_globalTrackChi2, LepGood_dxy, LepGood_dz, muonColl, muonCollLoose);
-    
+    Muon.MuonSelectionWithLoose(nLepGood, LepGood_pdgId, LepGood_pfMuonId, LepGood_isGlobalMuon, LepGood_isTrackerMuon, LepGood_eta, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_trackerHits, LepGood_pixelLayers, LepGood_nStations, LepGood_trackerLayers, LepGood_globalTrackChi2, LepGood_dxy, LepGood_dz, LepGood_mcMatchId, muonColl, muonCollLoose);
+
     Electron.SetPt(15);
     Electron.SetEta(2.5);
     Electron.SetRelIso(0.15);
     Electron.SetBSdxy(0.02);
     Electron.SetBSdz(0.10);
-    Electron.ElectronSelectionWithLoose(nLepGood, LepGood_pdgId, LepGood_etaSc, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_convVeto, LepGood_lostHits, LepGood_dEtaScTrkIn, LepGood_dPhiScTrkIn, LepGood_sigmaIEtaIEta, LepGood_hadronicOverEm, LepGood_eInvMinusPInv, LepGood_dxy, LepGood_dz, electronColl, electronCollLoose);
+    Electron.ElectronSelectionWithLoose(nLepGood, LepGood_pdgId, LepGood_etaSc, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_convVeto, LepGood_lostHits, LepGood_dEtaScTrkIn, LepGood_dPhiScTrkIn, LepGood_sigmaIEtaIEta, LepGood_hadronicOverEm, LepGood_eInvMinusPInv, LepGood_dxy, LepGood_dz, LepGood_mcMatchId, electronColl, electronCollLoose);
 
     if ( (electronColl.size()+muonColl.size())>1 )
       h_prova->Fill(10);
