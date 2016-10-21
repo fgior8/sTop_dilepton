@@ -210,11 +210,11 @@ void Analyzer::Loop() {
     
     Muon.SetPt(15);
     Muon.SetEta(2.4);
-    Muon.SetRelIso(0.12);
+    Muon.SetRelIso(0.15);
     Muon.SetChiNdof(10);
     Muon.SetBSdxy(0.20);
     Muon.SetBSdz(0.50);
-    Muon.MuonSelectionWithLoose(nLepGood, LepGood_pdgId, LepGood_pfMuonId, LepGood_isGlobalMuon, LepGood_isTrackerMuon, LepGood_eta, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso03, LepGood_charge, LepGood_trackerHits, LepGood_pixelLayers, LepGood_nStations, LepGood_trackerLayers, LepGood_globalTrackChi2, LepGood_dxy, LepGood_dz, LepGood_mcMatchId, muonColl, muonCollLoose);
+    Muon.MuonSelectionWithLoose(nLepGood, LepGood_pdgId, LepGood_pfMuonId, LepGood_isGlobalMuon, LepGood_isTrackerMuon, LepGood_eta, LepGood_pt, LepGood_px, LepGood_py, LepGood_pz, LepGood_energy, LepGood_relIso04, LepGood_charge, LepGood_trackerHits, LepGood_pixelLayers, LepGood_nStations, LepGood_trackerLayers, LepGood_globalTrackChi2, LepGood_dxy, LepGood_dz, LepGood_mcMatchId, muonColl, muonCollLoose);
 
     Electron.SetPt(15);
     Electron.SetEta(2.5);
