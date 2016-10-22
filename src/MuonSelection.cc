@@ -36,9 +36,9 @@ void MuonSel::MuonSelection(Int_t nMuon, Int_t *pdgId, Int_t *IsPF, Float_t *Eta
   
 }
 
-void MuonSel::MuonSelectionWithLoose(Int_t nMuon, Int_t *pdgId, Int_t *IsPF, Int_t *IsGlobal, Int_t *IsTracker, Float_t *Eta, Float_t *Pt, Float_t *Px, Float_t *Py, Float_t *Pz, Float_t *E, Float_t *relIso, Int_t *Charge, Int_t *ValidHits, Int_t *PixelValidHits, Float_t *ValidStations, Int_t *LayersWithMeasurement, Float_t *GlobalChi2, Float_t *dxy_ver, Float_t *dz_ver, std::vector<Lepton>& leptonColl, std::vector<Lepton>& leptonCollLoose) {
+void MuonSel::MuonSelectionWithLoose(Int_t nMuon, Int_t *pdgId, Int_t *IsPF, Int_t *IsGlobal, Int_t *IsTracker, Float_t *Eta, Float_t *Pt, Float_t *Px, Float_t *Py, Float_t *Pz, Float_t *E, Float_t *relIso, Int_t *Charge, Int_t *ValidHits, Int_t *PixelValidHits, Float_t *ValidStations, Int_t *LayersWithMeasurement, Float_t *GlobalChi2, Float_t *dxy_ver, Float_t *dz_ver, Int_t *mcMatchId, std::vector<Lepton>& leptonColl, std::vector<Lepton>& leptonCollLoose) {
 
-  for (UInt_t ilep=0; ilep<sizeof(Pt); ilep++) {
+  for (UInt_t ilep=0; ilep<nMuon; ilep++) {
     if (fabs(pdgId[ilep])!=13) continue;
     LeptonchiNdof = GlobalChi2[ilep]; 
 
